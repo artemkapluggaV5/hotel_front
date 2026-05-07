@@ -1,0 +1,71 @@
+.account-page {
+    padding: 40px 20px;
+}
+
+.account-header {
+    margin-bottom: 20px;
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.tabs button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 10px;
+    background: #f1f5f9;
+    cursor: pointer;
+}
+
+.booking-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.booking-card {
+    background: white;
+    padding: 18px;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+.booking-top {
+    display: flex;
+    justify-content: space-between;
+}
+
+.booking-info {
+    margin-top: 10px;
+}
+
+.booking-bottom {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* STATUS */
+.status {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.status.pending { background: #fef3c7; }
+.status.confirmed { background: #d1fae5; }
+.status.canceled { background: #fee2e2; }
+.status.active { background: #dbeafe; }
+
+.cancel-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
