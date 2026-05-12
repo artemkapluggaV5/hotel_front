@@ -359,3 +359,16 @@ body {
   margin-bottom: 20px;
   text-align: center;
 }
+
+.error-text {
+  color: #DC2626;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 5px;
+  display: block;
+}
+
+/* Красная рамка для поля с ошибкой */
+.form-input.error-border {
+  border-color: #DC2626;
+}

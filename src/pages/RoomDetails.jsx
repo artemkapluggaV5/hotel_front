@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api'; // ИСПОЛЬЗУЕМ НАШ API КЛИЕНТ
 
 import './RoomDetails.css';
 
@@ -37,47 +37,32 @@ function RoomDetails() {
 
             setLoading(true);
 
-            // =========================
-            // 1. СОЗДАЕМ BOOKING
-            // =========================
+            // ========================================================
+            // 1. СОЗДАЕМ BOOKING (Через наш api, заголовки добавятся сами)
+            // ========================================================
 
-            const bookingResponse = await axios.post(
-                'http://127.0.0.1:8000/api/bookings/',
-                {
-                    check_in_date: checkIn,
-                    check_out_date: checkOut
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-            );
+            const bookingResponse = await api.post('bookings/', {
+                check_in_date: checkIn,
+                check_out_date: checkOut
+            });
 
             const bookingId = bookingResponse.data.id;
 
-            // =========================
-            // 2. СОЗДАЕМ PLACEMENT
-            // =========================
+            // ========================================================
+            // 2. СОЗДАЕМ PLACEMENT (Через наш api)
+            // ========================================================
 
-            await axios.post(
-                'http://127.0.0.1:8000/api/placements/',
-                {
-                    booking: bookingId,
-                    room: room.id,
-                    check_in_date: checkIn,
-                    check_out_date: checkOut,
-                    guests_count: 2,
-                    status: 'waiting'
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-            );
+            await api.post('placements/', {
+                booking: bookingId,
+                room: room.id,
+                check_in_date: checkIn,
+                check_out_date: checkOut,
+                guests_count: 2,
+                status: 'waiting'
+            });
 
             alert('Бронирование успешно создано!');
+            navigate('/account'); // Уводим пользователя в личный кабинет
 
         } catch (error) {
 
@@ -85,12 +70,14 @@ function RoomDetails() {
 
             if (error.response?.data?.room) {
                 alert('Этот номер уже забронирован на выбранные даты.');
+            } else if (error.response?.status === 401) {
+                alert('Ошибка авторизации. Перезайдите в аккаунт.');
             } else {
-                alert('Ошибка бронирования.');
+                alert('Ошибка бронирования. Проверьте правильность дат.');
             }
+
             console.log('STATUS:', error.response?.status);
             console.log('DATA:', error.response?.data);
-            alert(JSON.stringify(error.response?.data, null, 2));
 
         } finally {
 
@@ -101,9 +88,8 @@ function RoomDetails() {
 
 
     useEffect(() => {
-
-        axios
-            .get(`http://127.0.0.1:8000/api/rooms/${id}/`)
+        // Загружаем данные номера через api
+        api.get(`rooms/${id}/`)
             .then(response => {
                 setRoom(response.data);
             })

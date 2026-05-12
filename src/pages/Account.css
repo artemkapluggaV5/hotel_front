@@ -1,71 +1,168 @@
 .account-page {
-    padding: 40px 20px;
+    padding-top: 40px;
+    padding-bottom: 80px;
 }
 
-.account-header {
-    margin-bottom: 20px;
+.account-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 40px;
+    align-items: start;
 }
 
+/* Сайдбар профиля */
+.profile-sidebar {
+    background: white;
+    padding: 40px 30px;
+    border-radius: 24px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+}
+
+.user-avatar {
+    width: 80px;
+    height: 80px;
+    background: #0EA5E9;
+    color: white;
+    font-size: 32px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+}
+
+.user-role {
+    font-size: 12px;
+    font-weight: 700;
+    color: #0EA5E9;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+}
+
+.user-details {
+    text-align: left;
+    border-top: 1px solid #F1F5F9;
+    padding-top: 25px;
+}
+
+.detail-item {
+    margin-bottom: 15px;
+}
+
+.detail-item label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #94A3B8;
+    text-transform: uppercase;
+}
+
+.detail-item span {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1E293B;
+}
+
+/* Табы */
 .tabs {
     display: flex;
     gap: 10px;
-    margin-bottom: 25px;
-    flex-wrap: wrap;
+    margin-bottom: 30px;
 }
 
 .tabs button {
-    padding: 8px 14px;
+    background: #F1F5F9;
     border: none;
-    border-radius: 10px;
-    background: #f1f5f9;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748B;
     cursor: pointer;
+    transition: all 0.3s;
 }
 
-.booking-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.booking-card {
-    background: white;
-    padding: 18px;
-    border-radius: 14px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-}
-
-.booking-top {
-    display: flex;
-    justify-content: space-between;
-}
-
-.booking-info {
-    margin-top: 10px;
-}
-
-.booking-bottom {
-    margin-top: 15px;
-    display: flex;
-    justify-content: space-between;
-}
-
-/* STATUS */
-.status {
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-}
-
-.status.pending { background: #fef3c7; }
-.status.confirmed { background: #d1fae5; }
-.status.canceled { background: #fee2e2; }
-.status.active { background: #dbeafe; }
-
-.cancel-btn {
-    background: #ef4444;
+.tabs button.active {
+    background: #0F172A;
     color: white;
-    border: none;
-    padding: 6px 12px;
+}
+
+/* Карточки бронирования */
+.booking-card-new {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    border: 1px solid #F1F5F9;
+}
+
+.b-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.b-number {
+    font-weight: 700;
+    color: #1E293B;
+}
+
+.status-badge {
+    padding: 4px 12px;
     border-radius: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.status-badge.pending { background: #FEF3C7; color: #92400E; }
+.status-badge.confirmed { background: #DCFCE7; color: #166534; }
+.status-badge.canceled { background: #FEE2E2; color: #991B1B; }
+
+.b-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.b-dates {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.b-dates label, .b-price label {
+    font-size: 10px;
+    font-weight: 800;
+    color: #94A3B8;
+    text-transform: uppercase;
+}
+
+.b-dates p, .b-price p {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0F172A;
+}
+
+.date-arrow { color: #CBD5E1; }
+
+.btn-cancel {
+    margin-top: 20px;
+    width: 100%;
+    background: transparent;
+    border: 2px solid #F1F5F9;
+    color: #EF4444;
+    padding: 10px;
+    border-radius: 12px;
+    font-weight: 700;
     cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-cancel:hover {
+    background: #FEE2E2;
+    border-color: #FEE2E2;
 }

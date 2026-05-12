@@ -1,56 +1,50 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../api'; // ИСПОЛЬЗУЕМ НАШ УМНЫЙ КЛИЕНТ
 import './Account.css';
 
 function Account() {
+    const [user, setUser] = useState(null);
     const [bookings, setBookings] = useState([]);
     const [tab, setTab] = useState('all');
     const [loading, setLoading] = useState(true);
 
     const username = localStorage.getItem('username');
-    const token = localStorage.getItem('token');
 
     useEffect(() => {
-        loadBookings();
+        loadData();
     }, []);
 
-    const loadBookings = async () => {
+    const loadData = async () => {
         try {
             setLoading(true);
-
-            const res = await axios.get(
-                'http://127.0.0.1:8000/api/bookings/',
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-            );
-
-            setBookings(res.data);
+            // Загружаем данные профиля и бронирования через наш api.js
+            const [userRes, bookingsRes] = await Promise.all([
+                api.get('me/'),
+                api.get('bookings/')
+            ]);
+            setUser(userRes.data);
+            setBookings(bookingsRes.data);
         } catch (err) {
-            console.error(err);
+            console.error("Ошибка загрузки данных:", err);
+            if (err.response?.status === 401) {
+                alert("Сессия истекла. Войдите заново.");
+            }
         } finally {
             setLoading(false);
         }
     };
 
     const cancelBooking = async (id) => {
-        try {
-            await axios.patch(
-                `http://127.0.0.1:8000/api/bookings/${id}/`,
-                { status: 'canceled' },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-            );
+        if (!window.confirm('Вы уверены, что хотите отменить бронирование?')) return;
 
-            loadBookings();
+        try {
+            // ОТПРАВЛЯЕМ PATCH ЧЕРЕЗ API КЛИЕНТ
+            await api.patch(`bookings/${id}/`, { status: 'canceled' });
+            alert('Бронирование отменено');
+            loadData(); // Перезагружаем список
         } catch (err) {
-            alert('Ошибка отмены брони');
-            console.error(err);
+            console.error("Ошибка при отмене:", err.response?.data);
+            alert('Не удалось отменить бронирование');
         }
     };
 
@@ -59,73 +53,83 @@ function Account() {
         return b.status === tab;
     });
 
-    const statusClass = (status) => {
-        if (status === 'pending') return 'status pending';
-        if (status === 'confirmed') return 'status confirmed';
-        if (status === 'canceled') return 'status canceled';
-        if (status === 'active') return 'status active';
-        return 'status';
-    };
-
     return (
-        <div className="account-page container">
+        <div className="container account-page">
+            <div className="account-grid">
 
-            <div className="account-header">
-                <h1>👋 Привет, {username}</h1>
-                <p>Ваш личный кабинет</p>
-            </div>
+                {/* ЛЕВАЯ ЧАСТЬ: ПРОФИЛЬ */}
+                <aside className="profile-sidebar">
+                    <div className="user-avatar">
+                        {username ? username[0].toUpperCase() : 'U'}
+                    </div>
+                    <h2>{user?.username || username}</h2>
+                    <p className="user-role">{user?.role === 'admin' ? 'Администратор' : 'Гость отеля'}</p>
 
-            <div className="tabs">
-                <button onClick={() => setTab('all')}>Все</button>
-                <button onClick={() => setTab('pending')}>Ожидание</button>
-                <button onClick={() => setTab('confirmed')}>Подтверждено</button>
-                <button onClick={() => setTab('canceled')}>Отменённые</button>
-            </div>
-
-            {loading ? (
-                <p>Загрузка...</p>
-            ) : filtered.length === 0 ? (
-                <div className="empty">
-                    У вас пока нет бронирований
-                </div>
-            ) : (
-                <div className="booking-list">
-
-                    {filtered.map(b => (
-                        <div className="booking-card" key={b.id}>
-
-                            <div className="booking-top">
-                                <h3>Бронь #{b.id}</h3>
-
-                                <span className={statusClass(b.status)}>
-                                    {b.status}
-                                </span>
-                            </div>
-
-                            <div className="booking-info">
-                                <p>📅 Заезд: {b.check_in_date}</p>
-                                <p>📅 Выезд: {b.check_out_date}</p>
-                            </div>
-
-                            <div className="booking-bottom">
-                                <strong>{b.total_price} ₽</strong>
-
-                                {b.status === 'pending' && (
-                                    <button
-                                        onClick={() => cancelBooking(b.id)}
-                                        className="cancel-btn"
-                                    >
-                                        Отменить
-                                    </button>
-                                )}
-                            </div>
-
+                    <div className="user-details">
+                        <div className="detail-item">
+                            <label>Email</label>
+                            <span>{user?.email || 'Загрузка...'}</span>
                         </div>
-                    ))}
+                        <div className="detail-item">
+                            <label>Телефон</label>
+                            <span>{user?.phone || 'Не указан'}</span>
+                        </div>
+                    </div>
+                </aside>
 
-                </div>
-            )}
+                {/* ПРАВАЯ ЧАСТЬ: СПИСОК БРОНЕЙ */}
+                <main className="account-content">
+                    <h1 className="section-title">Ваши брони</h1>
 
+                    <div className="tabs">
+                        <button className={tab === 'all' ? 'active' : ''} onClick={() => setTab('all')}>Все</button>
+                        <button className={tab === 'pending' ? 'active' : ''} onClick={() => setTab('pending')}>Ожидание</button>
+                        <button className={tab === 'confirmed' ? 'active' : ''} onClick={() => setTab('confirmed')}>Подтверждено</button>
+                        <button className={tab === 'canceled' ? 'active' : ''} onClick={() => setTab('canceled')}>Отменено</button>
+                    </div>
+
+                    {loading ? (
+                        <div className="empty-state"><p>Загрузка данных...</p></div>
+                    ) : filtered.length === 0 ? (
+                        <div className="empty-state">
+                            <p>У вас пока нет бронирований в этой категории</p>
+                        </div>
+                    ) : (
+                        <div className="booking-list">
+                            {filtered.map(b => (
+                                <div className="booking-card-new" key={b.id}>
+                                    <div className="b-header">
+                                        <span className="b-number">Бронирование №{b.id}</span>
+                                        <span className={`status-badge ${b.status}`}>{b.status}</span>
+                                    </div>
+                                    <div className="b-body">
+                                        <div className="b-dates">
+                                            <div>
+                                                <label>Заезд</label>
+                                                <p>{b.check_in_date}</p>
+                                            </div>
+                                            <div className="date-arrow">→</div>
+                                            <div>
+                                                <label>Выезд</label>
+                                                <p>{b.check_out_date}</p>
+                                            </div>
+                                        </div>
+                                        <div className="b-price">
+                                            <label>К оплате</label>
+                                            <p>{b.total_price} ₽</p>
+                                        </div>
+                                    </div>
+                                    {b.status === 'pending' && (
+                                        <button onClick={() => cancelBooking(b.id)} className="btn-cancel">
+                                            Отменить бронь
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </main>
+            </div>
         </div>
     );
 }

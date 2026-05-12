@@ -17,65 +17,29 @@ function NavLinks() {
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('username');
-
-        window.location.reload();
+        window.location.href = '/login';
     };
 
     return (
         <div className="nav-links">
-            <Link
-                to="/"
-                className={location.pathname === '/' ? "nav-link active" : "nav-link"}
-            >
-                Номера
-            </Link>
+            <Link to="/" className={location.pathname === '/' ? "nav-link active" : "nav-link"}>Номера</Link>
+            <Link to="/gallery" className="nav-link">Галерея</Link>
 
-            <Link to="/gallery" className="nav-link">
-                Галерея
-            </Link>
+            {token ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginLeft: '20px' }}>
 
-            <Link to="/about" className="nav-link">
-                О нас
-            </Link>
-
-            <Link to="/account" className="nav-link">
-                Личный кабинет
-            </Link>
-
-            {!token ? (
-                <>
-                    <Link
-                        to="/register"
-                        className="nav-link"
-                        style={{ marginLeft: '20px' }}
-                    >
-                        Регистрация
+                    <Link to="/account" className="nav-link" style={{ fontWeight: 'bold', color: '#0F172A' }}>
+                        👋 Привет, {username}!
                     </Link>
 
-                    <Link to="/login" className="btn-login">
-                        Войти
-                    </Link>
-                </>
-            ) : (
-                <>
-                    <div
-                        className="nav-link"
-                        style={{
-                            marginLeft: '20px',
-                            fontWeight: '700',
-                            color: '#0EA5E9'
-                        }}
-                    >
-                        Привет, {username} 👋
-                    </div>
-
-                    <button
-                        onClick={handleLogout}
-                        className="btn-login"
-                        style={{ border: 'none', cursor: 'pointer' }}
-                    >
+                    <button onClick={handleLogout} className="btn-login" style={{ background: '#DC2626' }}>
                         Выйти
                     </button>
+                </div>
+            ) : (
+                <>
+                    <Link to="/register" className="nav-link" style={{marginLeft: '20px'}}>Регистрация</Link>
+                    <Link to="/login" className="btn-login">Войти</Link>
                 </>
             )}
         </div>
