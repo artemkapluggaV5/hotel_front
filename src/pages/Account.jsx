@@ -17,7 +17,6 @@ function Account() {
     const loadData = async () => {
         try {
             setLoading(true);
-            // Загружаем данные профиля и бронирования через наш api.js
             const [userRes, bookingsRes] = await Promise.all([
                 api.get('me/'),
                 api.get('bookings/')
@@ -38,10 +37,9 @@ function Account() {
         if (!window.confirm('Вы уверены, что хотите отменить бронирование?')) return;
 
         try {
-            // ОТПРАВЛЯЕМ PATCH ЧЕРЕЗ API КЛИЕНТ
             await api.patch(`bookings/${id}/`, { status: 'canceled' });
             alert('Бронирование отменено');
-            loadData(); // Перезагружаем список
+            loadData();
         } catch (err) {
             console.error("Ошибка при отмене:", err.response?.data);
             alert('Не удалось отменить бронирование');
@@ -57,7 +55,6 @@ function Account() {
         <div className="container account-page">
             <div className="account-grid">
 
-                {/* ЛЕВАЯ ЧАСТЬ: ПРОФИЛЬ */}
                 <aside className="profile-sidebar">
                     <div className="user-avatar">
                         {username ? username[0].toUpperCase() : 'U'}
@@ -77,7 +74,6 @@ function Account() {
                     </div>
                 </aside>
 
-                {/* ПРАВАЯ ЧАСТЬ: СПИСОК БРОНЕЙ */}
                 <main className="account-content">
                     <h1 className="section-title">Ваши брони</h1>
 

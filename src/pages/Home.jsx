@@ -1,14 +1,36 @@
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
+
+// ИМПОРТЫ ДЛЯ КАЛЕНДАРЯ
+import { Calendar } from 'primereact/calendar';
+import { addLocale } from 'primereact/api';
 
 function Home() {
     const [rooms, setRooms] = useState([]);
 
+    // СОСТОЯНИЯ ДЛЯ КАЛЕНДАРЯ (хранят выбранные даты)
+    const [checkIn, setCheckIn] = useState(null);
+    const [checkOut, setCheckOut] = useState(null);
+
+    // Сегодняшняя дата (чтобы запретить выбор прошедших дней)
+    const today = new Date();
+
+    // НАСТРОЙКА РУССКОГО ЯЗЫКА ДЛЯ КАЛЕНДАРЯ
+    addLocale('ru', {
+        firstDayOfWeek: 1,
+        dayNames: ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'],
+        dayNamesShort: ['вск', 'пнд', 'втр', 'срд', 'чтв', 'птн', 'суб'],
+        dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+        monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+        monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+        today: 'Сегодня',
+        clear: 'Очистить'
+    });
+
     useEffect(() => {
         axios.get('http://127.0.0.1:8000/api/rooms/')
             .then(response => {
-                // Берем 6 номеров для красивой сетки
                 setRooms(response.data.slice(0, 6));
             })
             .catch(error => console.error("Ошибка API:", error));
@@ -32,14 +54,35 @@ function Home() {
                 </div>
 
                 <div className="booking-widget">
+
+                    {/* КАЛЕНДАРЬ ЗАЕЗДА */}
                     <div className="input-group">
                         <label>Заезд</label>
-                        <input type="date"/>
+                        <Calendar
+                            value={checkIn}
+                            onChange={(e) => setCheckIn(e.value)}
+                            minDate={today}
+                            placeholder="Выберите дату"
+                            dateFormat="dd.mm.yy"
+                            locale="ru"
+                            showIcon
+                        />
                     </div>
+
+                    {/* КАЛЕНДАРЬ ВЫЕЗДА */}
                     <div className="input-group">
                         <label>Выезд</label>
-                        <input type="date"/>
+                        <Calendar
+                            value={checkOut}
+                            onChange={(e) => setCheckOut(e.value)}
+                            minDate={checkIn || today}
+                            placeholder="Выберите дату"
+                            dateFormat="dd.mm.yy"
+                            locale="ru"
+                            showIcon
+                        />
                     </div>
+
                     <div className="input-group">
                         <label>Гости</label>
                         <select>
@@ -93,5 +136,4 @@ function Home() {
         </div>
     );
 }
-
 export default Home;

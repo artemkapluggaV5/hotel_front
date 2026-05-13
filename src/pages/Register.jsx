@@ -12,13 +12,11 @@ function Register() {
         password: ''
     });
 
-    // 1. Новое состояние для хранения ошибок конкретных полей
     const [fieldErrors, setFieldErrors] = useState({});
     const [error, setError] = useState('');
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
-        // Очищаем ошибку поля, когда пользователь начинает что-то исправлять
         if (fieldErrors[e.target.name]) {
             setFieldErrors({ ...fieldErrors, [e.target.name]: null });
         }
@@ -27,7 +25,7 @@ function Register() {
     const handleSubmit = (e) => {
         e.preventDefault();
         setError('');
-        setFieldErrors({}); // Сбрасываем старые ошибки перед новым запросом
+        setFieldErrors({});
 
         api.post('register/', formData)
             .then((response) => {
@@ -37,14 +35,16 @@ function Register() {
                 window.location.reload();
             })
             .catch(err => {
-                console.log("Детали ошибки от Django:", err.response?.data);
+                if (err.response) {
+                    console.log("Ошибка от сервера:", err.response.data);
 
-                // 2. Если Django вернул ошибку валидации (400 Bad Request)
-                if (err.response?.status === 400) {
-                    // Сохраняем объект с ошибками (например: {username: ["Занят"], phone: ["Неверный формат"]})
-                    setFieldErrors(err.response.data);
+                    if (err.response.status === 400) {
+                        setFieldErrors(err.response.data);
+                    } else {
+                        setError(`Ошибка сервера (${err.response.status}). Попробуйте позже.`);
+                    }
                 } else {
-                    setError('Произошла системная ошибка. Попробуйте позже.');
+                    setError('Не удалось связаться с сервером. Проверьте соединение.');
                 }
             });
     };
@@ -58,7 +58,6 @@ function Register() {
 
                 <form onSubmit={handleSubmit}>
 
-                    {/* ПОЛЕ ЛОГИН */}
                     <div className="form-group">
                         <label>Логин</label>
                         <input
@@ -69,11 +68,9 @@ function Register() {
                             required
                             onChange={handleChange}
                         />
-                        {/* 3. Вывод ошибки под полем */}
                         {fieldErrors.username && <span className="error-text">{fieldErrors.username[0]}</span>}
                     </div>
 
-                    {/* ПОЛЕ EMAIL */}
                     <div className="form-group">
                         <label>Email</label>
                         <input
@@ -87,21 +84,19 @@ function Register() {
                         {fieldErrors.email && <span className="error-text">{fieldErrors.email[0]}</span>}
                     </div>
 
-                    {/* ПОЛЕ ТЕЛЕФОН */}
                     <div className="form-group">
                         <label>Телефон</label>
                         <input
                             type="text"
                             name="phone"
                             className={`form-input ${fieldErrors.phone ? 'error-border' : ''}`}
-                            placeholder="8(999)123-45-67"
+                            placeholder="+79991234567"
                             required
                             onChange={handleChange}
                         />
                         {fieldErrors.phone && <span className="error-text">{fieldErrors.phone[0]}</span>}
                     </div>
 
-                    {/* ПОЛЕ ПАРОЛЬ */}
                     <div className="form-group">
                         <label>Пароль</label>
                         <input

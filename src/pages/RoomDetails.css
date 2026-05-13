@@ -2,7 +2,6 @@
     background: #F8FAFC;
 }
 
-/* HERO */
 
 .room-hero {
     padding: 40px 0;
@@ -33,7 +32,6 @@
     border-radius: 24px;
 }
 
-/* CONTENT */
 
 .room-content-section {
     display: grid;
@@ -81,7 +79,6 @@
     margin-bottom: 40px;
 }
 
-/* FEATURES */
 
 .room-features {
     display: flex;
@@ -103,7 +100,6 @@
     box-shadow: 0 6px 20px rgba(0,0,0,0.04);
 }
 
-/* DETAILS */
 
 .details-block {
     margin-bottom: 60px;
@@ -142,7 +138,6 @@
     font-size: 16px;
 }
 
-/* BOOKING CARD */
 
 .booking-sidebar {
     position: relative;
@@ -247,7 +242,6 @@
     transform: translateY(-3px);
 }
 
-/* LOADING */
 
 .room-loading {
     min-height: 70vh;
@@ -260,7 +254,6 @@
     font-weight: 700;
 }
 
-/* MOBILE */
 
 @media (max-width: 1000px) {
 

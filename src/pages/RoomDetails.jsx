@@ -17,6 +17,7 @@ function RoomDetails() {
 
     const navigate = useNavigate();
 
+    const today = new Date().toISOString().split('T')[0];
 
     const handleBooking = async () => {
 
@@ -37,20 +38,12 @@ function RoomDetails() {
 
             setLoading(true);
 
-            // ========================================================
-            // 1. СОЗДАЕМ BOOKING (Через наш api, заголовки добавятся сами)
-            // ========================================================
-
             const bookingResponse = await api.post('bookings/', {
                 check_in_date: checkIn,
                 check_out_date: checkOut
             });
 
             const bookingId = bookingResponse.data.id;
-
-            // ========================================================
-            // 2. СОЗДАЕМ PLACEMENT (Через наш api)
-            // ========================================================
 
             await api.post('placements/', {
                 booking: bookingId,
@@ -62,7 +55,7 @@ function RoomDetails() {
             });
 
             alert('Бронирование успешно создано!');
-            navigate('/account'); // Уводим пользователя в личный кабинет
+            navigate('/account');
 
         } catch (error) {
 
@@ -88,7 +81,6 @@ function RoomDetails() {
 
 
     useEffect(() => {
-        // Загружаем данные номера через api
         api.get(`rooms/${id}/`)
             .then(response => {
                 setRoom(response.data);
@@ -270,6 +262,7 @@ function RoomDetails() {
                                 <input
                                     type="date"
                                     value={checkIn}
+                                    min={today} // Запрещает выбор прошлых дат
                                     onChange={(e) => setCheckIn(e.target.value)}
                                 />
 

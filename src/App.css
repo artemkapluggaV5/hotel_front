@@ -1,10 +1,10 @@
-/* --- ГЛОБАЛЬНЫЕ НАСТРОЙКИ --- */
+
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  font-family: 'Plus Jakarta Sans', sans-serif; /* Супер-современный шрифт */
-  background-color: #F8FAFC; /* Очень светлый серо-голубой фон */
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: #F8FAFC;
   color: #334155;
   -webkit-font-smoothing: antialiased;
 }
@@ -14,10 +14,9 @@ body {
   padding: 0 20px;
 }
 
-/* --- СОВРЕМЕННАЯ ШАПКА (ЛИПКАЯ) --- */
 .main-header {
   background-color: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px); /* Размытие фона под шапкой */
+  backdrop-filter: blur(10px);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -42,13 +41,12 @@ body {
 }
 .logo-container p {
   font-size: 11px;
-  color: #0EA5E9; /* Современный акцентный синий */
+  color: #0EA5E9;
   text-transform: uppercase;
   font-weight: 600;
   letter-spacing: 2px;
 }
 
-/* --- МЕНЮ НАВИГАЦИИ --- */
 .nav-links {
   display: flex;
   gap: 30px;
@@ -67,7 +65,7 @@ body {
   background: #0F172A;
   color: white;
   padding: 10px 24px;
-  border-radius: 50px; /* Кнопка-пилюля */
+  border-radius: 50px;
   text-decoration: none;
   font-weight: 600;
   font-size: 14px;
@@ -79,7 +77,6 @@ body {
   box-shadow: 0 10px 20px rgba(14, 165, 233, 0.2);
 }
 
-/* --- БАННЕР (HERO) --- */
 .hero-section {
   position: relative;
   height: 600px;
@@ -90,7 +87,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 0 0 40px 40px; /* Скругление только снизу */
+  border-radius: 0 0 40px 40px;
   margin-bottom: 80px;
 }
 .hero-content {
@@ -110,7 +107,6 @@ body {
   opacity: 0.9;
 }
 
-/* --- ВИДЖЕТ БРОНИРОВАНИЯ (GLASSMORPHISM) --- */
 .booking-widget {
   position: absolute;
   bottom: -40px;
@@ -163,7 +159,6 @@ body {
   box-shadow: 0 10px 20px rgba(14, 165, 233, 0.3);
 }
 
-/* --- СЕТКА КАРТОЧЕК --- */
 .section-title {
   font-size: 32px;
   font-weight: 700;
@@ -177,7 +172,6 @@ body {
   margin-bottom: 80px;
 }
 
-/* --- СОВРЕМЕННАЯ КАРТОЧКА НОМЕРА --- */
 .room-card {
   background: white;
   border-radius: 24px;
@@ -203,7 +197,7 @@ body {
   transition: transform 0.6s ease;
 }
 .room-card:hover .room-image-wrapper img {
-  transform: scale(1.08); /* Картинка плавно увеличивается при наведении */
+  transform: scale(1.08);
 }
 .price-tag {
   position: absolute;
@@ -276,7 +270,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 75vh; /* Форма будет по центру экрана */
+  min-height: 75vh;
 }
 .auth-card {
   background: white;
@@ -368,7 +362,27 @@ body {
   display: block;
 }
 
-/* Красная рамка для поля с ошибкой */
 .form-input.error-border {
   border-color: #DC2626;
+}
+
+.booking-widget .p-calendar {
+  width: 180px;
+}
+
+.booking-widget .p-inputtext {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-weight: 600;
+  color: #0F172A;
+  padding: 0;
+  font-size: 15px;
+}
+
+.booking-widget .p-button {
+  background: transparent !important;
+  border: none !important;
+  color: #0EA5E9 !important;
+  padding: 0 5px 0 0 !important;
 }

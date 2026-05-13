@@ -60,7 +60,6 @@ function About() {
                 </div>
             </section>
 
-            {/* FEATURES */}
             <section className="features-section">
                 <div className="container">
                     <p className="section-mini center">ПОЧЕМУ ВЫБИРАЮТ НАС</p>
