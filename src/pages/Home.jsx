@@ -1,22 +1,24 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-
-// ИМПОРТЫ ДЛЯ КАЛЕНДАРЯ
 import { Calendar } from 'primereact/calendar';
 import { addLocale } from 'primereact/api';
+import { Dropdown } from 'primereact/dropdown';
 
 function Home() {
     const [rooms, setRooms] = useState([]);
 
-    // СОСТОЯНИЯ ДЛЯ КАЛЕНДАРЯ (хранят выбранные даты)
     const [checkIn, setCheckIn] = useState(null);
     const [checkOut, setCheckOut] = useState(null);
+    const [guests, setGuests] = useState(null);
+    const guestOptions = [
+        { name: '1 Взрослый', code: '1' },
+        { name: '2 Взрослых', code: '2' },
+        { name: 'Семья (3-4)', code: 'family' }
+    ];
 
-    // Сегодняшняя дата (чтобы запретить выбор прошедших дней)
     const today = new Date();
 
-    // НАСТРОЙКА РУССКОГО ЯЗЫКА ДЛЯ КАЛЕНДАРЯ
     addLocale('ru', {
         firstDayOfWeek: 1,
         dayNames: ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'],
@@ -85,11 +87,13 @@ function Home() {
 
                     <div className="input-group">
                         <label>Гости</label>
-                        <select>
-                            <option>1 Взрослый</option>
-                            <option>2 Взрослых</option>
-                            <option>Семья (3-4)</option>
-                        </select>
+                        <Dropdown
+                            value={guests}
+                            onChange={(e) => setGuests(e.value)}
+                            options={guestOptions}
+                            optionLabel="name"
+                            placeholder="Сколько людей?"
+                        />
                     </div>
                     <button className="btn-reserve">Искать номера</button>
                 </div>

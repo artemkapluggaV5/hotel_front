@@ -284,3 +284,15 @@
     }
 
 }
+
+.booking-sidebar .p-inputtext,
+.booking-sidebar .p-dropdown {
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 8px !important;
+    padding: 10px !important;
+    font-size: 14px;
+}
+
+.booking-sidebar .p-calendar {
+    width: 100%;
+}

@@ -1,26 +1,43 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api from '../api'; // ИСПОЛЬЗУЕМ НАШ API КЛИЕНТ
+import api from '../api';
+import { Calendar } from 'primereact/calendar';
+import { Dropdown } from 'primereact/dropdown';
+import { addLocale } from 'primereact/api';
 
 import './RoomDetails.css';
 
 function RoomDetails() {
-
     const { id } = useParams();
-
     const [room, setRoom] = useState(null);
-
-    const [checkIn, setCheckIn] = useState('');
-    const [checkOut, setCheckOut] = useState('');
-
     const [loading, setLoading] = useState(false);
-
     const navigate = useNavigate();
 
-    const today = new Date().toISOString().split('T')[0];
+    const [checkIn, setCheckIn] = useState(null);
+    const [checkOut, setCheckOut] = useState(null);
+
+    const [guests, setGuests] = useState(null);
+    const guestOptions = [
+        { name: '1 Гость', code: 1 },
+        { name: '2 Гостя', code: 2 },
+        { name: '3 Гостя', code: 3 },
+        { name: '4 Гостя', code: 4 }
+    ];
+
+    const today = new Date();
+
+    addLocale('ru', {
+        firstDayOfWeek: 1,
+        dayNames: ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'],
+        dayNamesShort: ['вск', 'пнд', 'втр', 'срд', 'чтв', 'птн', 'суб'],
+        dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+        monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+        monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+        today: 'Сегодня',
+        clear: 'Очистить'
+    });
 
     const handleBooking = async () => {
-
         const token = localStorage.getItem('token');
 
         if (!token) {
@@ -29,28 +46,39 @@ function RoomDetails() {
             return;
         }
 
-        if (!checkIn || !checkOut) {
-            alert('Выберите даты');
+        if (!checkIn || !checkOut || !guests) {
+            alert('Пожалуйста, выберите даты заезда, выезда и количество гостей.');
             return;
         }
 
         try {
-
             setLoading(true);
 
+            // КОНВЕРТИРУЕМ ДАТЫ ДЛЯ DJANGO (из объекта Date в строку YYYY-MM-DD)
+            // Добавляем getTimezoneOffset, чтобы дата не сместилась из-за часового пояса
+            const formatDjangoDate = (dateObj) => {
+                const d = new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 60000));
+                return d.toISOString().split('T')[0];
+            };
+
+            const strCheckIn = formatDjangoDate(checkIn);
+            const strCheckOut = formatDjangoDate(checkOut);
+
+            // 1. СОЗДАЕМ BOOKING
             const bookingResponse = await api.post('bookings/', {
-                check_in_date: checkIn,
-                check_out_date: checkOut
+                check_in_date: strCheckIn,     // Используем строки!
+                check_out_date: strCheckOut
             });
 
             const bookingId = bookingResponse.data.id;
 
+            // 2. СОЗДАЕМ PLACEMENT
             await api.post('placements/', {
                 booking: bookingId,
                 room: room.id,
-                check_in_date: checkIn,
-                check_out_date: checkOut,
-                guests_count: 2,
+                check_in_date: strCheckIn,     // Используем строки!
+                check_out_date: strCheckOut,
+                guests_count: guests.code,     // Берем цифру из объекта Dropdown
                 status: 'waiting'
             });
 
@@ -252,64 +280,48 @@ function RoomDetails() {
 
                         <div className="booking-form">
 
-
                             <div className="booking-input">
-
-                                <label>
-                                    Заезд
-                                </label>
-
-                                <input
-                                    type="date"
+                                <label>Заезд</label>
+                                <Calendar
                                     value={checkIn}
-                                    min={today} // Запрещает выбор прошлых дат
-                                    onChange={(e) => setCheckIn(e.target.value)}
+                                    onChange={(e) => setCheckIn(e.value)}
+                                    minDate={today}
+                                    placeholder="Выберите дату"
+                                    dateFormat="dd.mm.yy"
+                                    locale="ru"
+                                    showIcon
+                                    style={{ width: '100%' }} // Растягиваем на всю ширину блока
                                 />
-
                             </div>
 
-
                             <div className="booking-input">
-
-                                <label>
-                                    Выезд
-                                </label>
-
-                                <input
-                                    type="date"
+                                <label>Выезд</label>
+                                <Calendar
                                     value={checkOut}
-                                    onChange={(e) => setCheckOut(e.target.value)}
+                                    onChange={(e) => setCheckOut(e.value)}
+                                    minDate={checkIn || today}
+                                    placeholder="Выберите дату"
+                                    dateFormat="dd.mm.yy"
+                                    locale="ru"
+                                    showIcon
+                                    style={{ width: '100%' }}
                                 />
-
                             </div>
-
 
                             <div className="booking-input">
-
-                                <label>
-                                    Гости
-                                </label>
-
-                                <select>
-                                    <option>1 Гость</option>
-                                    <option>2 Гостя</option>
-                                    <option>3 Гостя</option>
-                                    <option>4 Гостя</option>
-                                </select>
-
+                                <label>Гости</label>
+                                <Dropdown
+                                    value={guests}
+                                    onChange={(e) => setGuests(e.value)}
+                                    options={guestOptions}
+                                    optionLabel="name"
+                                    placeholder="Сколько гостей?"
+                                    style={{ width: '100%' }}
+                                />
                             </div>
 
-
-                            <button
-                                className="reserve-btn"
-                                onClick={handleBooking}
-                                disabled={loading}
-                            >
-
-                                {loading
-                                    ? 'Создание брони...'
-                                    : 'Забронировать'}
-
+                            <button className="reserve-btn" onClick={handleBooking} disabled={loading}>
+                                {loading ? 'Создание брони...' : 'Забронировать'}
                             </button>
 
                         </div>

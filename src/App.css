@@ -386,3 +386,30 @@ body {
   color: #0EA5E9 !important;
   padding: 0 5px 0 0 !important;
 }
+
+.booking-widget .p-dropdown {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  width: 150px;
+  align-items: center;
+}
+
+.booking-widget .p-dropdown .p-dropdown-label {
+  font-weight: 600;
+  color: #0F172A;
+  padding: 0;
+  font-size: 15px;
+}
+
+.booking-widget .p-dropdown .p-dropdown-trigger {
+  width: 20px;
+  color: #0EA5E9;
+}
+
+.p-dropdown-panel {
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  border: 1px solid #E2E8F0;
+  overflow: hidden;
+}
