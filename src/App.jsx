@@ -7,16 +7,19 @@ import About from "./pages/About.jsx";
 import Gallery from "./pages/Gallery.jsx";
 import RoomDetails from "./pages/RoomDetails.jsx";
 import Account from './pages/Account';
+import Dashboard from './pages/Dashboard';
 
 function NavLinks() {
     const location = useLocation();
 
     const token = localStorage.getItem('token');
     const username = localStorage.getItem('username');
+    const role = localStorage.getItem('role');
 
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('username');
+        localStorage.removeItem('role');
         window.location.href = '/login';
     };
 
@@ -24,6 +27,11 @@ function NavLinks() {
         <div className="nav-links">
             <Link to="/" className={location.pathname === '/' ? "nav-link active" : "nav-link"}>Номера</Link>
             <Link to="/gallery" className="nav-link">Галерея</Link>
+            {(role === 'admin' || role === 'staff') && (
+                <Link to="/dashboard" className="nav-link" style={{color: '#0EA5E9', fontWeight: 'bold'}}>
+                    ⚙️ Панель управления
+                </Link>
+            )}
 
             {token ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginLeft: '20px' }}>
@@ -67,6 +75,7 @@ function App() {
                 <Route path="/gallery" element={<Gallery />} />
                 <Route path="/rooms/:id" element={<RoomDetails />} />
                 <Route path="/account" element={<Account />} />
+                <Route path="/dashboard" element={<Dashboard />} />
             </Routes>
         </BrowserRouter>
     );

@@ -1,21 +1,21 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api'; // Обязательно используем наш умный api!
 import { Link } from 'react-router-dom';
+
 import { Calendar } from 'primereact/calendar';
-import { addLocale } from 'primereact/api';
 import { Dropdown } from 'primereact/dropdown';
+import { addLocale } from 'primereact/api';
 
 function Home() {
+    // Состояния для списков с бэкенда
     const [rooms, setRooms] = useState([]);
+    const [categories, setCategories] = useState([]);
 
+    // Состояния фильтров
     const [checkIn, setCheckIn] = useState(null);
     const [checkOut, setCheckOut] = useState(null);
-    const [guests, setGuests] = useState(null);
-    const guestOptions = [
-        { name: '1 Взрослый', code: '1' },
-        { name: '2 Взрослых', code: '2' },
-        { name: 'Семья (3-4)', code: 'family' }
-    ];
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [maxPrice, setMaxPrice] = useState(null);
 
     const today = new Date();
 
@@ -30,13 +30,66 @@ function Home() {
         clear: 'Очистить'
     });
 
+    // Опции для фильтра цены
+    const priceOptions = [
+        { name: 'Любая цена', code: null },
+        { name: 'До 3 000 ₽', code: 3000 },
+        { name: 'До 6 000 ₽', code: 6000 },
+        { name: 'До 10 000 ₽', code: 10000 },
+        { name: 'До 20 000 ₽', code: 20000 },
+    ];
+
+    // При первой загрузке получаем номера и категории
     useEffect(() => {
-        axios.get('http://127.0.0.1:8000/api/rooms/')
-            .then(response => {
-                setRooms(response.data.slice(0, 6));
-            })
-            .catch(error => console.error("Ошибка API:", error));
+        api.get('rooms/')
+            .then(res => setRooms(res.data.slice(0, 6)))
+            .catch(err => console.error("Ошибка загрузки номеров:", err));
+
+        api.get('categories/')
+            .then(res => setCategories(res.data))
+            .catch(err => console.error("Ошибка загрузки категорий:", err));
     }, []);
+
+    // ФУНКЦИЯ ПОИСКА: Срабатывает при нажатии на кнопку
+    const handleSearch = async () => {
+        try {
+            // Собираем параметры в объект
+            let queryParams = {};
+
+            // 1. Форматируем даты для Django (YYYY-MM-DD), если они выбраны
+            if (checkIn && checkOut) {
+                const formatDjangoDate = (dateObj) => {
+                    const d = new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 60000));
+                    return d.toISOString().split('T')[0];
+                };
+                queryParams.check_in = formatDjangoDate(checkIn);
+                queryParams.check_out = formatDjangoDate(checkOut);
+            } else if (checkIn || checkOut) {
+                alert("Пожалуйста, выберите обе даты (заезд и выезд) или очистите их.");
+                return;
+            }
+
+            // 2. Добавляем ID категории
+            if (selectedCategory) {
+                queryParams.category = selectedCategory.id;
+            }
+
+            // 3. Добавляем максимальную цену
+            if (maxPrice && maxPrice.code) {
+                queryParams.max_price = maxPrice.code;
+            }
+
+            // 4. Отправляем запрос на бэкенд с фильтрами!
+            const response = await api.get('rooms/', { params: queryParams });
+
+            // Заменяем карточки на те, что нашел бэкенд
+            setRooms(response.data);
+
+        } catch (error) {
+            console.error("Ошибка при поиске:", error);
+            alert("Не удалось выполнить поиск.");
+        }
+    };
 
     const fakeImages = [
         "https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=800&auto=format&fit=crop",
@@ -55,89 +108,89 @@ function Home() {
                     <p>Премиальные номера по лучшим ценам в самом сердце города</p>
                 </div>
 
-                <div className="booking-widget">
+                <div className="booking-widget" style={{ paddingRight: '15px' }}>
 
-                    {/* КАЛЕНДАРЬ ЗАЕЗДА */}
                     <div className="input-group">
                         <label>Заезд</label>
-                        <Calendar
-                            value={checkIn}
-                            onChange={(e) => setCheckIn(e.value)}
-                            minDate={today}
-                            placeholder="Выберите дату"
-                            dateFormat="dd.mm.yy"
-                            locale="ru"
-                            showIcon
-                        />
+                        <Calendar value={checkIn} onChange={(e) => setCheckIn(e.value)} minDate={today} placeholder="Выберите дату" dateFormat="dd.mm.yy" locale="ru" showIcon />
                     </div>
 
-                    {/* КАЛЕНДАРЬ ВЫЕЗДА */}
                     <div className="input-group">
                         <label>Выезд</label>
-                        <Calendar
-                            value={checkOut}
-                            onChange={(e) => setCheckOut(e.value)}
-                            minDate={checkIn || today}
-                            placeholder="Выберите дату"
-                            dateFormat="dd.mm.yy"
-                            locale="ru"
-                            showIcon
+                        <Calendar value={checkOut} onChange={(e) => setCheckOut(e.value)} minDate={checkIn || today} placeholder="Выберите дату" dateFormat="dd.mm.yy" locale="ru" showIcon />
+                    </div>
+
+                    <div className="input-group">
+                        <label>Категория</label>
+                        <Dropdown
+                            value={selectedCategory}
+                            onChange={(e) => setSelectedCategory(e.value)}
+                            options={categories}
+                            optionLabel="name" // Показываем название категории из базы
+                            placeholder="Любая"
+                            showClear // Появляется крестик, чтобы сбросить выбор
                         />
                     </div>
 
                     <div className="input-group">
-                        <label>Гости</label>
+                        <label>Цена до</label>
                         <Dropdown
-                            value={guests}
-                            onChange={(e) => setGuests(e.value)}
-                            options={guestOptions}
+                            value={maxPrice}
+                            onChange={(e) => setMaxPrice(e.value)}
+                            options={priceOptions}
                             optionLabel="name"
-                            placeholder="Сколько людей?"
+                            placeholder="Не важно"
                         />
                     </div>
-                    <button className="btn-reserve">Искать номера</button>
+
+                    <button className="btn-reserve" onClick={handleSearch}>Искать номера</button>
                 </div>
             </div>
 
             <div className="container">
-                <h2 className="section-title">Популярные направления</h2>
+                <h2 className="section-title">Результаты поиска</h2>
 
-                <div className="rooms-grid">
-                    {rooms.map((room, index) => {
-                        const amenitiesArray = room.amenities ? room.amenities.split(',').map(item => item.trim()) : [];
+                {/* Если ничего не найдено, показываем текст */}
+                {rooms.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '50px', color: '#64748B', fontSize: '18px' }}>
+                        По вашему запросу свободных номеров не найдено 😔
+                    </div>
+                ) : (
+                    <div className="rooms-grid">
+                        {rooms.map((room, index) => {
+                            const amenitiesArray = room.amenities ? room.amenities.split(',').map(item => item.trim()) : [];
+                            return (
+                                <div key={room.id} className="room-card">
+                                    <div className="room-image-wrapper">
+                                        {/* Если в базе есть реальная картинка, показываем её, иначе фейковую */}
+                                        <img src={room.image ? room.image : fakeImages[index % fakeImages.length]} alt="Номер"/>
+                                        <div className="price-tag">{room.price} ₽ / ночь</div>
+                                    </div>
 
-                        return (
-                            <div key={room.id} className="room-card">
-                                <div className="room-image-wrapper">
-                                    <img src={fakeImages[index % fakeImages.length]} alt="Номер"/>
-                                    <div className="price-tag">{room.price} ₽ / ночь</div>
+                                    <div className="room-content">
+                                        <h3>Номер {room.room_number}</h3>
+                                        <p className="room-desc">
+                                            {room.description ? room.description.substring(0, 90) + '...' : 'Превосходный номер с шикарным видом. Идеально подойдет для комфортного отдыха.'}
+                                        </p>
+
+                                        <ul className="amenities-list">
+                                            {amenitiesArray.slice(0, 3).map((amenity, i) => (
+                                                <li key={i}>{amenity}</li>
+                                            ))}
+                                        </ul>
+
+                                        <Link to={`/rooms/${room.id}`} className="btn-card" style={{textAlign: 'center', textDecoration: 'none'}}>
+                                            Забронировать
+                                        </Link>
+                                    </div>
                                 </div>
-
-                                <div className="room-content">
-                                    <h3>Номер {room.room_number}</h3>
-                                    <p className="room-desc">
-                                        {room.description ? room.description.substring(0, 90) + '...' : 'Превосходный номер с шикарным видом. Идеально подойдет для комфортного отдыха.'}
-                                    </p>
-
-                                    <ul className="amenities-list">
-                                        {amenitiesArray.slice(0, 3).map((amenity, i) => (
-                                            <li key={i}>{amenity}</li>
-                                        ))}
-                                    </ul>
-
-                                    <Link
-                                        to={`/rooms/${room.id}`}
-                                        className="btn-card"
-                                    >
-                                        Забронировать
-                                    </Link>
-                                </div>
-                            </div>
-                        )
-                    })}
-                </div>
+                            )
+                        })}
+                    </div>
+                )}
             </div>
         </div>
     );
 }
+
 export default Home;
