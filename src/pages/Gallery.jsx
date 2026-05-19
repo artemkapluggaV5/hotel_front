@@ -1,5 +1,13 @@
 import './Gallery.css';
 
+// === ИМПОРТЫ LIGHTGALLERY ===
+import LightGallery from 'lightgallery/react';
+import 'lightgallery/css/lightgallery.css';
+import 'lightgallery/css/lg-zoom.css';
+import 'lightgallery/css/lg-thumbnail.css';
+import lgThumbnail from 'lightgallery/plugins/thumbnail';
+import lgZoom from 'lightgallery/plugins/zoom';
+
 function Gallery() {
 
     const images = [
@@ -40,66 +48,51 @@ function Gallery() {
     return (
         <div className="gallery-page">
 
-
             <section className="gallery-hero">
-
                 <div className="gallery-hero-overlay">
-
                     <div className="container">
-
                         <div className="gallery-hero-content">
-
                             <p className="gallery-subtitle">
                                 OASIS EXPERIENCE
                             </p>
-
                             <h1>
                                 Галерея нашего отеля
                             </h1>
-
                             <p>
                                 Окунитесь в атмосферу роскоши,
                                 комфорта и современного дизайна.
                             </p>
-
                         </div>
-
                     </div>
-
                 </div>
-
             </section>
 
-
             <section className="gallery-section container">
-
-                <div className="gallery-masonry">
-
+                <LightGallery
+                    speed={500}
+                    plugins={[lgThumbnail, lgZoom]}
+                    selector=".lg-item"
+                    elementClassNames="gallery-masonry"
+                >
                     {images.map((image, index) => (
-
-                        <div
+                        <a
+                            href={image.src}
                             key={index}
-                            className={`gallery-card ${index % 5 === 0 ? 'large' : ''}`}
+                            className={`gallery-card lg-item ${index % 5 === 0 ? 'large' : ''}`}
                         >
-
                             <img
                                 src={image.src}
                                 alt={image.title}
                             />
 
                             <div className="gallery-card-overlay">
-
                                 <h3>
                                     {image.title}
                                 </h3>
-
                             </div>
-
-                        </div>
-
+                        </a>
                     ))}
-
-                </div>
+                </LightGallery>
 
             </section>
 

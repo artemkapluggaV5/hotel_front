@@ -13,7 +13,7 @@ function Dashboard() {
     useEffect(() => {
         const role = localStorage.getItem('role');
         if (role === 'guest' || !role) {
-            alert('У вас нет доступа к этой странице!');
+            toast.error('У вас нет доступа к этой странице!');
             navigate('/');
             return;
         }
@@ -43,9 +43,9 @@ function Dashboard() {
         try {
             await api.patch(`placements/${id}/`, { status: 'active' });
             loadPlacements();
-            alert('Гость успешно заселён!');
+            toast.success('Гость успешно заселён!');
         } catch (err) {
-            alert('Ошибка при заселении.');
+            toast.error(err.response?.data?.error || 'Ошибка при заселении.');
         }
     };
 
@@ -54,19 +54,19 @@ function Dashboard() {
         try {
             await api.patch(`placements/${id}/`, { status: 'finished' });
             loadPlacements();
-            alert('Гость выселен. Номер отправлен на уборку.');
+            toast.success('Гость выселен. Номер отправлен на уборку.');
         } catch (err) {
-            alert('Ошибка при выселении.');
+            toast.error('Ошибка при выселении.');
         }
     };
 
     const handleFinishCleaning = async (roomId) => {
         try {
             await api.post(`rooms/${roomId}/finish_cleaning/`);
-            alert('Уборка завершена!');
+            toast.success('Уборка завершена!');
             loadPlacements();
         } catch (err) {
-            alert('Ошибка при обновлении статуса');
+            toast.error('Ошибка при обновлении статуса');
         }
     };
 

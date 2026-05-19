@@ -7,7 +7,6 @@ import { Dropdown } from 'primereact/dropdown';
 import { addLocale } from 'primereact/api';
 
 function Home() {
-    // Состояния для списков с бэкенда
     const [rooms, setRooms] = useState([]);
     const [categories, setCategories] = useState([]);
 
@@ -30,7 +29,6 @@ function Home() {
         clear: 'Очистить'
     });
 
-    // Опции для фильтра цены
     const priceOptions = [
         { name: 'Любая цена', code: null },
         { name: 'До 3 000 ₽', code: 3000 },
@@ -39,7 +37,6 @@ function Home() {
         { name: 'До 20 000 ₽', code: 20000 },
     ];
 
-    // При первой загрузке получаем номера и категории
     useEffect(() => {
         api.get('rooms/')
             .then(res => setRooms(res.data.slice(0, 6)))
@@ -50,13 +47,10 @@ function Home() {
             .catch(err => console.error("Ошибка загрузки категорий:", err));
     }, []);
 
-    // ФУНКЦИЯ ПОИСКА: Срабатывает при нажатии на кнопку
     const handleSearch = async () => {
         try {
-            // Собираем параметры в объект
             let queryParams = {};
 
-            // 1. Форматируем даты для Django (YYYY-MM-DD), если они выбраны
             if (checkIn && checkOut) {
                 const formatDjangoDate = (dateObj) => {
                     const d = new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 60000));
@@ -65,29 +59,25 @@ function Home() {
                 queryParams.check_in = formatDjangoDate(checkIn);
                 queryParams.check_out = formatDjangoDate(checkOut);
             } else if (checkIn || checkOut) {
-                alert("Пожалуйста, выберите обе даты (заезд и выезд) или очистите их.");
+                toast.warning("Пожалуйста, выберите обе даты (заезд и выезд) или очистите их.");
                 return;
             }
 
-            // 2. Добавляем ID категории
             if (selectedCategory) {
                 queryParams.category = selectedCategory.id;
             }
 
-            // 3. Добавляем максимальную цену
             if (maxPrice && maxPrice.code) {
                 queryParams.max_price = maxPrice.code;
             }
 
-            // 4. Отправляем запрос на бэкенд с фильтрами!
             const response = await api.get('rooms/', { params: queryParams });
 
-            // Заменяем карточки на те, что нашел бэкенд
             setRooms(response.data);
 
         } catch (error) {
             console.error("Ошибка при поиске:", error);
-            alert("Не удалось выполнить поиск.");
+            toast.error("Не удалось выполнить поиск.");
         }
     };
 
@@ -150,7 +140,6 @@ function Home() {
             <div className="container">
                 <h2 className="section-title">Результаты поиска</h2>
 
-                {/* Если ничего не найдено, показываем текст */}
                 {rooms.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '50px', color: '#64748B', fontSize: '18px' }}>
                         По вашему запросу свободных номеров не найдено 😔

@@ -296,3 +296,21 @@
 .booking-sidebar .p-calendar {
     width: 100%;
 }
+
+.room-gallery a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: zoom-in;
+}
+
+.room-gallery a img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.room-gallery a:hover img {
+    transform: scale(1.02);
+}

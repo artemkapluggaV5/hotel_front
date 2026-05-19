@@ -2,7 +2,6 @@
     background: #F8FAFC;
 }
 
-/* HERO */
 
 .gallery-hero {
     height: 65vh;
@@ -70,18 +69,14 @@
 }
 
 .gallery-card {
+    display: block;
+    text-decoration: none;
     position: relative;
-
     height: 340px;
-
     overflow: hidden;
-
     border-radius: 30px;
-
     cursor: pointer;
-
     box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-
     transition: 0.4s ease;
 }
 

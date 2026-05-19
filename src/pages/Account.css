@@ -10,8 +10,8 @@
     align-items: start;
 }
 
-/* Сайдбар профиля */
 .profile-sidebar {
+    position: relative; /* Обязательно! */
     background: white;
     padding: 40px 30px;
     border-radius: 24px;
@@ -166,3 +166,138 @@
     background: #FEE2E2;
     border-color: #FEE2E2;
 }
+
+/* Кнопка с карандашом */
+.btn-edit-profile {
+    background: transparent;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+/* Новая позиция кнопки */
+.btn-edit-profile-top {
+    position: absolute;
+    top: 20px;    /* Отступ сверху */
+    right: 20px;  /* Отступ справа */
+    background: #F1F5F9; /* Светлый фон для кнопки */
+    border: none;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+}
+
+.btn-edit-profile-top:hover {
+    opacity: 1;
+    background: #E2E8F0;
+    transform: rotate(15deg); /* Слегка наклоняется при наведении */
+}
+
+.btn-edit-profile:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Затемнение фона для модалки */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* Белая карточка формы */
+.modal-content {
+    background: white;
+    padding: 35px;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-content h2 {
+    font-size: 22px;
+    color: #0F172A;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.modal-input-group {
+    margin-bottom: 20px;
+}
+
+.modal-input-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748B;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.modal-input-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #E2E8F0;
+    border-radius: 10px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.modal-input-group input:focus {
+    border-color: #0EA5E9;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn-modal-cancel {
+    flex: 1;
+    background: #F1F5F9;
+    color: #64748B;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.btn-modal-cancel:hover { background: #E2E8F0; }
+
+.btn-modal-save {
+    flex: 1;
+    background: #0EA5E9;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.btn-modal-save:hover { background: #0284C7; }

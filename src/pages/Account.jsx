@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import api from '../api'; // ИСПОЛЬЗУЕМ НАШ УМНЫЙ КЛИЕНТ
+import api from '../api';
 import './Account.css';
+import { toast } from 'react-toastify';
 
 function Account() {
     const [user, setUser] = useState(null);
@@ -9,6 +10,9 @@ function Account() {
     const [loading, setLoading] = useState(true);
 
     const username = localStorage.getItem('username');
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editForm, setEditForm] = useState({ email: '', phone: '' });
 
     useEffect(() => {
         loadData();
@@ -26,7 +30,7 @@ function Account() {
         } catch (err) {
             console.error("Ошибка загрузки данных:", err);
             if (err.response?.status === 401) {
-                alert("Сессия истекла. Войдите заново.");
+                toast.error("Сессия истекла. Войдите заново.");
             }
         } finally {
             setLoading(false);
@@ -35,14 +39,40 @@ function Account() {
 
     const cancelBooking = async (id) => {
         if (!window.confirm('Вы уверены, что хотите отменить бронирование?')) return;
-
         try {
             await api.patch(`bookings/${id}/`, { status: 'canceled' });
-            alert('Бронирование отменено');
+            toast.success('Бронирование отменено');
             loadData();
         } catch (err) {
-            console.error("Ошибка при отмене:", err.response?.data);
-            alert('Не удалось отменить бронирование');
+            toast.error('Не удалось отменить бронирование');
+        }
+    };
+
+    const openEditModal = () => {
+        setEditForm({
+            email: user?.email || '',
+            phone: user?.phone || ''
+        });
+        setIsModalOpen(true);
+    };
+
+    const handleUpdateProfile = async (e) => {
+        e.preventDefault();
+        try {
+            await api.patch('me/', editForm);
+
+            setUser(prevUser => ({
+                ...prevUser,
+                email: editForm.email,
+                phone: editForm.phone
+            }));
+
+            setIsModalOpen(false);
+
+            toast.success('Профиль обновлен!');
+
+        } catch (err) {
+            toast.error('Ошибка при обновлении профиля. Email или телефон уже заняты.');
         }
     };
 
@@ -56,10 +86,16 @@ function Account() {
             <div className="account-grid">
 
                 <aside className="profile-sidebar">
+                    <button onClick={openEditModal} className="btn-edit-profile-top" title="Редактировать профиль">
+                        ✏️
+                    </button>
+
                     <div className="user-avatar">
                         {username ? username[0].toUpperCase() : 'U'}
                     </div>
+
                     <h2>{user?.username || username}</h2>
+
                     <p className="user-role">{user?.role === 'admin' ? 'Администратор' : 'Гость отеля'}</p>
 
                     <div className="user-details">
@@ -100,25 +136,14 @@ function Account() {
                                     </div>
                                     <div className="b-body">
                                         <div className="b-dates">
-                                            <div>
-                                                <label>Заезд</label>
-                                                <p>{b.check_in_date}</p>
-                                            </div>
+                                            <div><label>Заезд</label><p>{b.check_in_date}</p></div>
                                             <div className="date-arrow">→</div>
-                                            <div>
-                                                <label>Выезд</label>
-                                                <p>{b.check_out_date}</p>
-                                            </div>
+                                            <div><label>Выезд</label><p>{b.check_out_date}</p></div>
                                         </div>
-                                        <div className="b-price">
-                                            <label>К оплате</label>
-                                            <p>{b.total_price} ₽</p>
-                                        </div>
+                                        <div className="b-price"><label>К оплате</label><p>{b.total_price} ₽</p></div>
                                     </div>
                                     {b.status === 'pending' && (
-                                        <button onClick={() => cancelBooking(b.id)} className="btn-cancel">
-                                            Отменить бронь
-                                        </button>
+                                        <button onClick={() => cancelBooking(b.id)} className="btn-cancel">Отменить бронь</button>
                                     )}
                                 </div>
                             ))}
@@ -126,6 +151,41 @@ function Account() {
                     )}
                 </main>
             </div>
+
+            {isModalOpen && (
+                <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <h2>Редактирование профиля</h2>
+
+                        <form onSubmit={handleUpdateProfile}>
+                            <div className="modal-input-group">
+                                <label>Новый Email</label>
+                                <input
+                                    type="email"
+                                    required
+                                    value={editForm.email}
+                                    onChange={(e) => setEditForm({...editForm, email: e.target.value})}
+                                />
+                            </div>
+                            <div className="modal-input-group">
+                                <label>Новый Телефон</label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={editForm.phone}
+                                    onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
+                                />
+                            </div>
+
+                            <div className="modal-buttons">
+                                <button type="button" className="btn-modal-cancel" onClick={() => setIsModalOpen(false)}>Отмена</button>
+                                <button type="submit" className="btn-modal-save">Сохранить</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }

@@ -387,26 +387,54 @@ body {
   padding: 0 5px 0 0 !important;
 }
 
+/* --- ВЫПАДАЮЩИЕ СПИСКИ (Категория и Гости) --- */
 .booking-widget .p-dropdown {
   border: none !important;
   background: transparent !important;
   box-shadow: none !important;
-  width: 150px;
+  width: 160px; /* Сделали чуть шире, чтобы всё влезло */
+  display: flex;
   align-items: center;
+  position: relative; /* Важно для позиционирования крестика */
 }
 
-.booking-widget .p-dropdown .p-dropdown-label {
+/* Текст внутри выпадающего списка */
+.booking-widget .p-dropdown-label {
   font-weight: 600;
   color: #0F172A;
-  padding: 0;
+  padding: 0 !important;
+  padding-right: 45px !important; /* Делаем жесткий отступ справа, чтобы текст НИКОГДА не налез на иконки */
   font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Если текст длинный, в конце будет "..." */
 }
 
-.booking-widget .p-dropdown .p-dropdown-trigger {
+/* Главная стрелочка (V) */
+.booking-widget .p-dropdown-trigger {
   width: 20px;
-  color: #0EA5E9;
+  color: #0EA5E9 !important;
+  position: absolute;
+  right: 0; /* Прижимаем к правому краю */
 }
 
+/* Идеальный крестик очистки (X) */
+.booking-widget .p-dropdown-clear-icon {
+  position: absolute !important;
+  right: 25px !important; /* Ставим его ровно перед стрелочкой */
+  top: 50% !important;
+  transform: translateY(-50%) !important; /* Идеальное выравнивание по вертикали */
+  color: #94A3B8 !important; /* Спокойный серый цвет */
+  font-size: 14px !important;
+  transition: color 0.2s ease;
+}
+
+/* При наведении крестик становится красным */
+.booking-widget .p-dropdown-clear-icon:hover {
+  color: #EF4444 !important;
+}
+
+/* Само выпадающее меню (которое открывается по клику) */
 .p-dropdown-panel {
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.1);

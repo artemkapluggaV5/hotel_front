@@ -8,6 +8,8 @@ import Gallery from "./pages/Gallery.jsx";
 import RoomDetails from "./pages/RoomDetails.jsx";
 import Account from './pages/Account';
 import Dashboard from './pages/Dashboard';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; // Стили для тостов
 
 function NavLinks() {
     const location = useLocation();
@@ -77,6 +79,12 @@ function App() {
                 <Route path="/account" element={<Account />} />
                 <Route path="/dashboard" element={<Dashboard />} />
             </Routes>
+            <ToastContainer
+                position="bottom-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                theme="colored"
+            />
         </BrowserRouter>
     );
 }
