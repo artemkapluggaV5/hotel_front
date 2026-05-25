@@ -33,6 +33,7 @@ body {
   color: #0F172A;
   display: flex;
   flex-direction: column;
+  justify-content: center; /* Центрируем по вертикали */
 }
 .logo-container h1 {
   font-size: 24px;
@@ -440,4 +441,139 @@ body {
   box-shadow: 0 10px 30px rgba(0,0,0,0.1);
   border: 1px solid #E2E8F0;
   overflow: hidden;
+}
+
+
+/* =========================================
+   ФУТЕР (ПОДВАЛ САЙТА)
+========================================= */
+.main-footer {
+  background-color: #0F172A; /* Тот же глубокий синий, что в нашем меню и кнопках */
+  color: #94A3B8;
+  padding-top: 70px;
+  margin-top: auto; /* Прижимает футер к низу, если контента мало */
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 50px;
+  margin-bottom: 50px;
+}
+
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* ЦЕНТРИРУЕМ ВСЁ В ЭТОЙ КОЛОНКЕ */
+  text-align: center;  /* Текст тоже по центру */
+}
+
+/* Блок бренда */
+.footer-brand h2 {
+  color: white;
+  font-size: 28px;
+  letter-spacing: 2px;
+  margin: 0;
+  line-height: 1;
+}
+
+.footer-subtitle {
+  font-size: 11px;
+  color: #0EA5E9;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin: 5px 0 20px 0;
+}
+
+.footer-desc {
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 25px;
+  max-width: 320px;
+  color: #94A3B8;
+}
+
+.social-icons {
+  display: flex;
+  justify-content: center; /* Иконки соцсетей по центру */
+  gap: 15px;
+}
+
+.social-icons i {
+  font-size: 20px;
+  color: white;
+  background: rgba(255,255,255,0.1);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.social-icons i:hover {
+  background: #0EA5E9;
+  transform: translateY(-3px);
+}
+
+/* Заголовки колонок */
+.footer-title {
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 25px;
+}
+
+/* Списки ссылок и контактов */
+.footer-links ul, .footer-contact ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-links li, .footer-contact li {
+  margin-bottom: 15px;
+}
+
+.footer-links a {
+  color: #94A3B8;
+  text-decoration: none;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.footer-links a:hover {
+  color: #0EA5E9;
+  padding-left: 5px; /* Эффект сдвига при наведении */
+}
+
+.footer-contact li {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 14px;
+}
+
+.footer-contact i {
+  color: #0EA5E9;
+  font-size: 18px;
+}
+
+/* Нижняя полоска с копирайтом */
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding: 25px 0;
+  text-align: center;
+  font-size: 13px;
+  color: #64748B;
+}
+
+/* Для мобилок */
+@media (max-width: 768px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
 }

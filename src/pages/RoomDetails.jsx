@@ -70,13 +70,14 @@ function RoomDetails() {
             const strCheckIn = formatDjangoDate(checkIn);
             const strCheckOut = formatDjangoDate(checkOut);
 
+            // 1. Создаем Бронь
             const bookingResponse = await api.post('bookings/', {
                 check_in_date: strCheckIn,
                 check_out_date: strCheckOut
             });
-
             const bookingId = bookingResponse.data.id;
 
+            // 2. Создаем Размещение
             await api.post('placements/', {
                 booking: bookingId,
                 room: room.id,
@@ -86,8 +87,21 @@ function RoomDetails() {
                 status: 'waiting'
             });
 
-            toast.success('Бронирование успешно создано!');
-            navigate('/account');
+            // ==========================================
+            // 3. НОВЫЙ ШАГ: СОЗДАЕМ ПЛАТЕЖ В ЮKASSA
+            // ==========================================
+            toast.info('Создаем защищенный платеж...');
+
+            // Стучимся на наш бэкенд, чтобы он сгенерировал ссылку ЮKassa
+            const payResponse = await api.post('pay/', { booking_id: bookingId });
+
+            // Если ссылка получена — перекидываем юзера на сайт ЮKassa!
+            if (payResponse.data.confirmation_url) {
+                window.location.href = payResponse.data.confirmation_url;
+            } else {
+                toast.success('Бронь создана, но ссылка на оплату не получена. Перейдите в ЛК.');
+                navigate('/account');
+            }
 
         } catch (error) {
             console.error("ПОЛНАЯ ОШИБКА:", error.response?.data);
@@ -96,7 +110,7 @@ function RoomDetails() {
             } else if (error.response?.data?.room) {
                 toast.error('Этот номер уже забронирован на эти даты.');
             } else {
-                toast.error('Ошибка бронирования.');
+                toast.error('Ошибка бронирования или создания платежа.');
             }
         } finally {
             setLoading(false);
