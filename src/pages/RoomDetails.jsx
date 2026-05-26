@@ -25,6 +25,9 @@ function RoomDetails() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    // 1. ПРАВИЛЬНО ОБЪЯВИЛИ СОСТОЯНИЕ (На самом верху компонента)
+    const [userBookings, setUserBookings] = useState([]);
+
     const today = new Date();
 
     const guestOptions = [
@@ -87,19 +90,14 @@ function RoomDetails() {
                 status: 'waiting'
             });
 
-            // ==========================================
-            // 3. НОВЫЙ ШАГ: СОЗДАЕМ ПЛАТЕЖ В ЮKASSA
-            // ==========================================
+            // 3. Создаем платеж в ЮKassa
             toast.info('Создаем защищенный платеж...');
-
-            // Стучимся на наш бэкенд, чтобы он сгенерировал ссылку ЮKassa
             const payResponse = await api.post('pay/', { booking_id: bookingId });
 
-            // Если ссылка получена — перекидываем юзера на сайт ЮKassa!
             if (payResponse.data.confirmation_url) {
-                window.location.href = payResponse.data.confirmation_url;
+                window.location.href = payResponse.data.confirmation_url; // Редирект в банк
             } else {
-                toast.success('Бронь создана, но ссылка на оплату не получена. Перейдите в ЛК.');
+                toast.success('Бронь создана, перейдите в личный кабинет для оплаты.');
                 navigate('/account');
             }
 
@@ -107,10 +105,13 @@ function RoomDetails() {
             console.error("ПОЛНАЯ ОШИБКА:", error.response?.data);
             if (error.response?.status === 403) {
                 toast.error('Доступ запрещен: Бэкенд не разрешает гостям создавать размещения.');
+            } else if (error.response?.data?.non_field_errors) {
+                // Если сработала защита от спама на бэкенде
+                toast.error(error.response.data.non_field_errors[0]);
             } else if (error.response?.data?.room) {
                 toast.error('Этот номер уже забронирован на эти даты.');
             } else {
-                toast.error('Ошибка бронирования или создания платежа.');
+                toast.error('Ошибка бронирования.');
             }
         } finally {
             setLoading(false);
@@ -118,9 +119,18 @@ function RoomDetails() {
     };
 
     useEffect(() => {
+        // Получаем информацию о комнате
         api.get(`rooms/${id}/`)
             .then(response => setRoom(response.data))
             .catch(error => console.error(error));
+
+        // Получаем бронирования пользователя, чтобы проверить статус
+        const token = localStorage.getItem('token');
+        if (token) {
+            api.get('bookings/')
+                .then(res => setUserBookings(res.data))
+                .catch(err => console.error(err));
+        }
     }, [id]);
 
     if (!room) return <div className="room-loading">Загрузка номера...</div>;
@@ -134,6 +144,11 @@ function RoomDetails() {
         'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=1600&auto=format&fit=crop',
     ];
 
+    // Проверяем, есть ли у этого юзера неоплаченная бронь НА ЭТОТ номер
+    const hasPendingForThisRoom = userBookings.some(b =>
+        b.status === 'pending' && b.rooms?.some(r => r.room_id === Number(id))
+    );
+
     return (
         <div className="room-details-page">
 
@@ -146,13 +161,9 @@ function RoomDetails() {
                         selector=".lg-item"
                     >
                         <div className="room-gallery">
-
-                            {/* Главное изображение */}
                             <a href={galleryImages[0]} className="main-image lg-item">
                                 <img src={galleryImages[0]} alt="Room Main" />
                             </a>
-
-                            {/* Дополнительные изображения сбоку */}
                             <div className="side-images">
                                 {galleryImages.slice(1).map((img, index) => (
                                     <a href={img} key={index} className="lg-item">
@@ -160,7 +171,6 @@ function RoomDetails() {
                                     </a>
                                 ))}
                             </div>
-
                         </div>
                     </LightGallery>
 
@@ -220,9 +230,20 @@ function RoomDetails() {
                                 <Dropdown value={guests} onChange={(e) => setGuests(e.value)} options={guestOptions} optionLabel="name" placeholder="Сколько гостей?" style={{ width: '100%' }} />
                             </div>
 
-                            <button className="reserve-btn" onClick={handleBooking} disabled={loading}>
-                                {loading ? 'Создание брони...' : 'Забронировать'}
-                            </button>
+                            {/* ИНТЕГРИРОВАЛИ УМНУЮ КНОПКУ */}
+                            {hasPendingForThisRoom ? (
+                                <button
+                                    className="reserve-btn"
+                                    onClick={() => navigate('/account')}
+                                    style={{ background: '#F59E0B', color: '#1E293B', fontWeight: 'bold' }}
+                                >
+                                    ⚠️ Ожидает оплаты в ЛК
+                                </button>
+                            ) : (
+                                <button className="reserve-btn" onClick={handleBooking} disabled={loading}>
+                                    {loading ? 'Создание брони...' : 'Забронировать'}
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>

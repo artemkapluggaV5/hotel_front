@@ -11,15 +11,20 @@ function Account() {
 
     const username = localStorage.getItem('username');
 
+    // Состояния для модалки ПРОФИЛЯ
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editForm, setEditForm] = useState({ email: '', phone: '' });
 
+    // Состояния для модалки ПАРОЛЯ
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
     const [passwordForm, setPasswordForm] = useState({
         current_password: '',
         new_password: '',
         confirm_password: ''
     });
+
+    // Состояние для модалки ВАУЧЕРА
+    const [voucherBooking, setVoucherBooking] = useState(null);
 
     useEffect(() => {
         loadData();
@@ -33,7 +38,36 @@ function Account() {
                 api.get('bookings/')
             ]);
             setUser(userRes.data);
-            setBookings(bookingsRes.data);
+
+            const fetchedBookings = bookingsRes.data;
+            setBookings(fetchedBookings);
+
+            // ==========================================
+            // МАГИЯ АВТОПРОВЕРКИ ОПЛАТЫ (БЕЗ ВЕБХУКОВ)
+            // ==========================================
+            const pendingBookings = fetchedBookings.filter(b => b.status === 'pending');
+            let statusChanged = false;
+
+            for (let b of pendingBookings) {
+                try {
+                    const checkRes = await api.post('pay/check/', { booking_id: b.id });
+                    if (checkRes.data.status === 'success') {
+                        statusChanged = true;
+                        toast.success(`Бронь №${b.id} успешно оплачена!`, {
+                            toastId: `pay_success_${b.id}` // Защита от дублей уведомлений
+                        });
+                    }
+                } catch (e) {
+                    console.error("Фоновая проверка не удалась", e);
+                }
+            }
+
+            // Если хоть одна бронь оплатилась, пока мы заходили, обновляем список
+            if (statusChanged) {
+                const freshBookingsRes = await api.get('bookings/');
+                setBookings(freshBookingsRes.data);
+            }
+
         } catch (err) {
             console.error("Ошибка загрузки данных:", err);
             if (err.response?.status === 401) {
@@ -44,6 +78,7 @@ function Account() {
         }
     };
 
+    // Красивые даты на русском
     const formatHumanDate = (dateStr) => {
         if (!dateStr) return '';
         const date = new Date(dateStr);
@@ -58,10 +93,9 @@ function Account() {
         e.preventDefault();
         try {
             const res = await api.post('change-password/', passwordForm);
+            localStorage.setItem('token', res.data.new_token); // Обновляем токен у себя
 
-            localStorage.setItem('token', res.data.new_token);
-
-            toast.success('Пароль успешно изменен');
+            toast.success('Пароль успешно изменен! Все остальные сессии завершены.');
             setIsPasswordModalOpen(false);
             setPasswordForm({ current_password: '', new_password: '', confirm_password: '' });
         } catch (err) {
@@ -82,32 +116,13 @@ function Account() {
 
     const handlePayment = async (bookingId) => {
         try {
-            toast.info('Перенаправление на ЮKassa...');
+            toast.info('Перенаправление в банк...');
             const res = await api.post('pay/', { booking_id: bookingId });
-            window.location.href = res.data.confirmation_url;
+            window.location.href = res.data.confirmation_url; // Переход на ЮKassa
         } catch (err) {
             toast.error(err.response?.data?.error || 'Ошибка при создании платежа');
         }
     };
-
-    // Функция проверки статуса (если юзер только что вернулся с ЮKassa)
-    const checkPaymentStatus = async (bookingId) => {
-        try {
-            const res = await api.post('pay/check/', { booking_id: bookingId });
-            if (res.data.status === 'success') {
-                toast.success('🎉 Оплата успешно подтверждена!');
-                loadData(); // Перезагружаем статусы (pending -> confirmed)
-            } else if (res.data.status === 'canceled') {
-                toast.error('Платеж был отменен.');
-                loadData();
-            } else {
-                toast.info('Оплата еще обрабатывается банком. Проверьте чуть позже.');
-            }
-        } catch (err) {
-            toast.error('Ошибка при проверке статуса. Попробуйте позже.');
-        }
-    };
-
 
     const openEditModal = () => {
         setEditForm({
@@ -122,6 +137,7 @@ function Account() {
         try {
             await api.patch('me/', editForm);
 
+            // Оптимистичное обновление UI (без морганий и перезагрузок)
             setUser(prevUser => ({
                 ...prevUser,
                 email: editForm.email,
@@ -130,7 +146,6 @@ function Account() {
 
             setIsModalOpen(false);
             toast.success('Профиль обновлен!');
-
         } catch (err) {
             toast.error('Ошибка при обновлении профиля. Email или телефон уже заняты.');
         }
@@ -141,9 +156,9 @@ function Account() {
         return b.status === tab;
     }).sort((a, b) => {
         const statusWeight = {
-            'confirmed': 1,
-            'pending': 2,
-            'canceled': 3
+            'pending': 1,     // СТАЛО: Неоплаченные на первом месте!
+            'confirmed': 2,   // Подтвержденные на втором
+            'canceled': 3     // Отмененные в самом низу
         };
 
         const weightA = statusWeight[a.status] || 99;
@@ -156,10 +171,13 @@ function Account() {
         return b.id - a.id;
     });
 
+    const [userBookings, setUserBookings] = useState([]);
+
     return (
         <div className="container account-page">
             <div className="account-grid">
 
+                {/* САЙДБАР СЛЕВА */}
                 <aside className="profile-sidebar">
                     <button onClick={openEditModal} className="btn-edit-profile-top" title="Редактировать профиль">
                         ✏️
@@ -192,6 +210,7 @@ function Account() {
                     </div>
                 </aside>
 
+                {/* СПИСОК БРОНЕЙ СПРАВА */}
                 <main className="account-content">
                     <h1 className="section-title">Ваши брони</h1>
 
@@ -217,6 +236,14 @@ function Account() {
                                         <span className={`status-badge ${b.status}`}>{b.status}</span>
                                     </div>
                                     <div className="b-body">
+
+                                        {/* ВЫВОД НОМЕРА КОМНАТЫ И КАТЕГОРИИ */}
+                                        {b.rooms && b.rooms.map((r, i) => (
+                                            <div key={i} style={{ marginBottom: '15px', fontSize: '15px', color: '#1E293B' }}>
+                                                🏨 <b>Номер {r.room_number}</b> — <span style={{ color: '#64748B' }}>{r.category_name}</span>
+                                            </div>
+                                        ))}
+
                                         <div className="b-dates">
                                             <div>
                                                 <label>Заезд</label>
@@ -230,8 +257,32 @@ function Account() {
                                         </div>
                                         <div className="b-price"><label>К оплате</label><p>{b.total_price} ₽</p></div>
                                     </div>
+
                                     {b.status === 'pending' && (
-                                        <button onClick={() => cancelBooking(b.id)} className="btn-cancel">Отменить бронь</button>
+                                        <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                                            <button onClick={() => handlePayment(b.id)} className="btn-reserve" style={{ flex: 1, padding: '12px', borderRadius: '10px' }}>
+                                                Оплатить онлайн
+                                            </button>
+                                            <button onClick={() => cancelBooking(b.id)} className="btn-cancel" style={{ width: 'auto', padding: '12px 25px', marginTop: 0 }}>
+                                                Отменить
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {/* УМНЫЕ КНОПКИ ДЛЯ ОПЛАЧЕННЫХ БРОНЕЙ */}
+                                    {b.status === 'confirmed' && (
+                                        <div style={{ marginTop: '20px' }}>
+                                            <button
+                                                onClick={() => setVoucherBooking(b)}
+                                                className="btn-reserve"
+                                                style={{ width: '100%', background: '#0F172A', padding: '12px', borderRadius: '10px' }}
+                                            >
+                                                📄 Открыть ваучер
+                                            </button>
+                                            <p style={{ fontSize: '11px', color: '#94A3B8', textAlign: 'center', marginTop: '10px' }}>
+                                                Для отмены оплаченной брони свяжитесь с поддержкой
+                                            </p>
+                                        </div>
                                     )}
                                 </div>
                             ))}
@@ -241,8 +292,8 @@ function Account() {
             </div>
 
             {isModalOpen && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
+                <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <h2>Редактирование профиля</h2>
 
                         <form onSubmit={handleUpdateProfile}>
@@ -274,9 +325,10 @@ function Account() {
                 </div>
             )}
 
+            {/* МОДАЛКА 2: СМЕНА ПАРОЛЯ */}
             {isPasswordModalOpen && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
+                <div className="modal-overlay" onClick={() => setIsPasswordModalOpen(false)}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <h2>Смена пароля</h2>
 
                         <form onSubmit={handleChangePassword}>
@@ -313,6 +365,54 @@ function Account() {
                                 <button type="submit" className="btn-modal-save" style={{background: '#DC2626'}}>Обновить пароль</button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {voucherBooking && (
+                <div className="modal-overlay" onClick={() => setVoucherBooking(null)}>
+                    <div className="modal-content printable-voucher" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px', padding: '0', overflow: 'hidden' }}>
+                        <div style={{ background: '#0F172A', color: 'white', padding: '30px', textAlign: 'center' }}>
+                            <h2 style={{ color: 'white', margin: 0, letterSpacing: '2px' }}>OASIS HOTEL</h2>
+                            <p style={{ color: '#0EA5E9', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '3px', marginTop: '5px' }}>Электронный ваучер</p>
+                        </div>
+                        <div style={{ padding: '30px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #E2E8F0', paddingBottom: '15px', marginBottom: '15px' }}>
+                                <span style={{ color: '#64748B', fontSize: '14px' }}>Бронирование №</span>
+                                <span style={{ fontWeight: 'bold', fontSize: '16px' }}>{voucherBooking.id}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #E2E8F0', paddingBottom: '15px', marginBottom: '15px' }}>
+                                <span style={{ color: '#64748B', fontSize: '14px' }}>Гость</span>
+                                <span style={{ fontWeight: 'bold', fontSize: '16px' }}>{user?.full_name || user?.username}</span>
+                            </div>
+
+                            {/* СТРОЧКА С НОМЕРОМ В ВАУЧЕРЕ */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #E2E8F0', paddingBottom: '15px', marginBottom: '15px' }}>
+                                <span style={{ color: '#64748B', fontSize: '14px' }}>Номер комнаты</span>
+                                <span style={{ fontWeight: 'bold', fontSize: '16px', color: '#0EA5E9' }}>
+                                    {voucherBooking.rooms?.map(r => `№${r.room_number} (${r.category_name})`).join(', ') || 'Не назначен'}
+                                </span>
+                            </div>
+
+                            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #E2E8F0', paddingBottom: '15px', marginBottom: '15px' }}>
+                                <div style={{ textAlign: 'left' }}>
+                                    <span style={{ display: 'block', color: '#64748B', fontSize: '12px', textTransform: 'uppercase' }}>Заезд</span>
+                                    <span style={{ fontWeight: 'bold' }}>{formatHumanDate(voucherBooking.check_in_date)}</span>
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <span style={{ display: 'block', color: '#64748B', fontSize: '12px', textTransform: 'uppercase' }}>Выезд</span>
+                                    <span style={{ fontWeight: 'bold' }}>{formatHumanDate(voucherBooking.check_out_date)}</span>
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px', background: '#F8FAFC', padding: '15px', borderRadius: '10px' }}>
+                                <span style={{ color: '#64748B', fontSize: '14px' }}>Статус оплаты</span>
+                                <span style={{ fontWeight: '800', color: '#10B981', fontSize: '18px' }}>ОПЛАЧЕНО</span>
+                            </div>
+                            <div style={{ display: 'flex', gap: '15px', marginTop: '30px' }}>
+                                <button className="btn-modal-cancel" onClick={() => setVoucherBooking(null)}>Закрыть</button>
+                                <button className="btn-modal-save" style={{ background: '#0F172A' }} onClick={() => window.print()}>🖨️ Распечатать</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
