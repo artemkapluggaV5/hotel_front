@@ -13,7 +13,8 @@ function Account() {
 
     // Состояния для модалки ПРОФИЛЯ
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editForm, setEditForm] = useState({ email: '', phone: '' });
+    const [editForm, setEditForm] = useState({ email: '', phone: '', telegram_id: '' });
+
 
     // Состояния для модалки ПАРОЛЯ
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -127,7 +128,8 @@ function Account() {
     const openEditModal = () => {
         setEditForm({
             email: user?.email || '',
-            phone: user?.phone || ''
+            phone: user?.phone || '',
+            telegram_id: user?.telegram_id || '' // <--- ДОБАВИЛИ ЭТО
         });
         setIsModalOpen(true);
     };
@@ -137,15 +139,17 @@ function Account() {
         try {
             await api.patch('me/', editForm);
 
-            // Оптимистичное обновление UI (без морганий и перезагрузок)
+            // ДОБАВИЛИ telegram_id В ОПТИМИСТИЧНОЕ ОБНОВЛЕНИЕ
             setUser(prevUser => ({
                 ...prevUser,
                 email: editForm.email,
-                phone: editForm.phone
+                phone: editForm.phone,
+                telegram_id: editForm.telegram_id // <--- Вот эта строчка всё починит
             }));
 
             setIsModalOpen(false);
             toast.success('Профиль обновлен!');
+
         } catch (err) {
             toast.error('Ошибка при обновлении профиля. Email или телефон уже заняты.');
         }
@@ -313,6 +317,15 @@ function Account() {
                                     required
                                     value={editForm.phone}
                                     onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
+                                />
+                            </div>
+                            <div className="modal-input-group">
+                                <label>Telegram ID (Узнать в @getmyid_bot)</label>
+                                <input
+                                    type="text"
+                                    placeholder="Например: 123456789"
+                                    value={editForm.telegram_id}
+                                    onChange={(e) => setEditForm({...editForm, telegram_id: e.target.value})}
                                 />
                             </div>
 
