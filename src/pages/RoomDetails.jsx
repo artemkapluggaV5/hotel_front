@@ -25,7 +25,6 @@ function RoomDetails() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    // 1. ПРАВИЛЬНО ОБЪЯВИЛИ СОСТОЯНИЕ (На самом верху компонента)
     const [userBookings, setUserBookings] = useState([]);
 
     const today = new Date();
@@ -90,7 +89,6 @@ function RoomDetails() {
                 status: 'waiting'
             });
 
-            // 3. Создаем платеж в ЮKassa
             toast.info('Создаем защищенный платеж...');
             const payResponse = await api.post('pay/', { booking_id: bookingId });
 
@@ -106,7 +104,6 @@ function RoomDetails() {
             if (error.response?.status === 403) {
                 toast.error('Доступ запрещен: Бэкенд не разрешает гостям создавать размещения.');
             } else if (error.response?.data?.non_field_errors) {
-                // Если сработала защита от спама на бэкенде
                 toast.error(error.response.data.non_field_errors[0]);
             } else if (error.response?.data?.room) {
                 toast.error('Этот номер уже забронирован на эти даты.');
@@ -119,12 +116,10 @@ function RoomDetails() {
     };
 
     useEffect(() => {
-        // Получаем информацию о комнате
         api.get(`rooms/${id}/`)
             .then(response => setRoom(response.data))
             .catch(error => console.error(error));
 
-        // Получаем бронирования пользователя, чтобы проверить статус
         const token = localStorage.getItem('token');
         if (token) {
             api.get('bookings/')
@@ -144,7 +139,6 @@ function RoomDetails() {
         'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=1600&auto=format&fit=crop',
     ];
 
-    // Проверяем, есть ли у этого юзера неоплаченная бронь НА ЭТОТ номер
     const hasPendingForThisRoom = userBookings.some(b =>
         b.status === 'pending' && b.rooms?.some(r => r.room_id === Number(id))
     );
@@ -230,7 +224,6 @@ function RoomDetails() {
                                 <Dropdown value={guests} onChange={(e) => setGuests(e.value)} options={guestOptions} optionLabel="name" placeholder="Сколько гостей?" style={{ width: '100%' }} />
                             </div>
 
-                            {/* ИНТЕГРИРОВАЛИ УМНУЮ КНОПКУ */}
                             {hasPendingForThisRoom ? (
                                 <button
                                     className="reserve-btn"

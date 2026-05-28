@@ -11,12 +11,10 @@ function Account() {
 
     const username = localStorage.getItem('username');
 
-    // Состояния для модалки ПРОФИЛЯ
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editForm, setEditForm] = useState({ email: '', phone: '', telegram_id: '' });
 
 
-    // Состояния для модалки ПАРОЛЯ
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
     const [passwordForm, setPasswordForm] = useState({
         current_password: '',
@@ -24,7 +22,6 @@ function Account() {
         confirm_password: ''
     });
 
-    // Состояние для модалки ВАУЧЕРА
     const [voucherBooking, setVoucherBooking] = useState(null);
 
     useEffect(() => {
@@ -43,9 +40,6 @@ function Account() {
             const fetchedBookings = bookingsRes.data;
             setBookings(fetchedBookings);
 
-            // ==========================================
-            // МАГИЯ АВТОПРОВЕРКИ ОПЛАТЫ (БЕЗ ВЕБХУКОВ)
-            // ==========================================
             const pendingBookings = fetchedBookings.filter(b => b.status === 'pending');
             let statusChanged = false;
 
@@ -55,7 +49,7 @@ function Account() {
                     if (checkRes.data.status === 'success') {
                         statusChanged = true;
                         toast.success(`Бронь №${b.id} успешно оплачена!`, {
-                            toastId: `pay_success_${b.id}` // Защита от дублей уведомлений
+                            toastId: `pay_success_${b.id}`
                         });
                     }
                 } catch (e) {
@@ -63,7 +57,6 @@ function Account() {
                 }
             }
 
-            // Если хоть одна бронь оплатилась, пока мы заходили, обновляем список
             if (statusChanged) {
                 const freshBookingsRes = await api.get('bookings/');
                 setBookings(freshBookingsRes.data);
@@ -79,7 +72,6 @@ function Account() {
         }
     };
 
-    // Красивые даты на русском
     const formatHumanDate = (dateStr) => {
         if (!dateStr) return '';
         const date = new Date(dateStr);
@@ -139,12 +131,11 @@ function Account() {
         try {
             await api.patch('me/', editForm);
 
-            // ДОБАВИЛИ telegram_id В ОПТИМИСТИЧНОЕ ОБНОВЛЕНИЕ
             setUser(prevUser => ({
                 ...prevUser,
                 email: editForm.email,
                 phone: editForm.phone,
-                telegram_id: editForm.telegram_id // <--- Вот эта строчка всё починит
+                telegram_id: editForm.telegram_id
             }));
 
             setIsModalOpen(false);
@@ -160,9 +151,9 @@ function Account() {
         return b.status === tab;
     }).sort((a, b) => {
         const statusWeight = {
-            'pending': 1,     // СТАЛО: Неоплаченные на первом месте!
-            'confirmed': 2,   // Подтвержденные на втором
-            'canceled': 3     // Отмененные в самом низу
+            'pending': 1,
+            'confirmed': 2,
+            'canceled': 3
         };
 
         const weightA = statusWeight[a.status] || 99;
@@ -181,7 +172,6 @@ function Account() {
         <div className="container account-page">
             <div className="account-grid">
 
-                {/* САЙДБАР СЛЕВА */}
                 <aside className="profile-sidebar">
                     <button onClick={openEditModal} className="btn-edit-profile-top" title="Редактировать профиль">
                         ✏️
@@ -214,7 +204,6 @@ function Account() {
                     </div>
                 </aside>
 
-                {/* СПИСОК БРОНЕЙ СПРАВА */}
                 <main className="account-content">
                     <h1 className="section-title">Ваши брони</h1>
 
@@ -241,7 +230,6 @@ function Account() {
                                     </div>
                                     <div className="b-body">
 
-                                        {/* ВЫВОД НОМЕРА КОМНАТЫ И КАТЕГОРИИ */}
                                         {b.rooms && b.rooms.map((r, i) => (
                                             <div key={i} style={{ marginBottom: '15px', fontSize: '15px', color: '#1E293B' }}>
                                                 🏨 <b>Номер {r.room_number}</b> — <span style={{ color: '#64748B' }}>{r.category_name}</span>
@@ -273,7 +261,6 @@ function Account() {
                                         </div>
                                     )}
 
-                                    {/* УМНЫЕ КНОПКИ ДЛЯ ОПЛАЧЕННЫХ БРОНЕЙ */}
                                     {b.status === 'confirmed' && (
                                         <div style={{ marginTop: '20px' }}>
                                             <button
@@ -338,7 +325,6 @@ function Account() {
                 </div>
             )}
 
-            {/* МОДАЛКА 2: СМЕНА ПАРОЛЯ */}
             {isPasswordModalOpen && (
                 <div className="modal-overlay" onClick={() => setIsPasswordModalOpen(false)}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -399,7 +385,6 @@ function Account() {
                                 <span style={{ fontWeight: 'bold', fontSize: '16px' }}>{user?.full_name || user?.username}</span>
                             </div>
 
-                            {/* СТРОЧКА С НОМЕРОМ В ВАУЧЕРЕ */}
                             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #E2E8F0', paddingBottom: '15px', marginBottom: '15px' }}>
                                 <span style={{ color: '#64748B', fontSize: '14px' }}>Номер комнаты</span>
                                 <span style={{ fontWeight: 'bold', fontSize: '16px', color: '#0EA5E9' }}>

@@ -5,7 +5,6 @@ function Footer() {
         <footer className="main-footer">
             <div className="container footer-grid">
 
-                {/* БЛОК 1: О БРЕНДЕ */}
                 <div className="footer-brand">
                     <h2>OASIS</h2>
                     <p className="footer-subtitle">Boutique Hotel</p>
@@ -20,7 +19,6 @@ function Footer() {
                     </div>
                 </div>
 
-                {/* БЛОК 2: БЫСТРЫЕ ССЫЛКИ */}
                 <div className="footer-links">
                     <h3 className="footer-title">Навигация</h3>
                     <ul>
@@ -31,7 +29,6 @@ function Footer() {
                     </ul>
                 </div>
 
-                {/* БЛОК 3: КОНТАКТЫ */}
                 <div className="footer-contact">
                     <h3 className="footer-title">Контакты</h3>
                     <ul>
@@ -52,7 +49,6 @@ function Footer() {
 
             </div>
 
-            {/* КОПИРАЙТ */}
             <div className="footer-bottom">
                 <div className="container">
                     <p>© {new Date().getFullYear()} OASIS Boutique Hotel. Все права защищены.</p>

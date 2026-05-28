@@ -6,7 +6,6 @@ import { toast } from 'react-toastify';
 function Register() {
     const navigate = useNavigate();
 
-    // 1 (Форма), 2 (Ввод кода)
     const [step, setStep] = useState(1);
     const [verificationCode, setVerificationCode] = useState('');
 
@@ -23,7 +22,6 @@ function Register() {
         }
     };
 
-    // ШАГ 1: Отправка формы и получение письма
     const handleRegisterSubmit = async (e) => {
         e.preventDefault();
         setFieldErrors({});
@@ -31,7 +29,7 @@ function Register() {
         try {
             await api.post('register/', formData);
             toast.success('Код отправлен на вашу почту!');
-            setStep(2); // Переключаем интерфейс на ввод кода
+            setStep(2);
         } catch (err) {
             if (err.response?.status === 400) {
                 setFieldErrors(err.response.data);
@@ -51,7 +49,6 @@ function Register() {
                 code: verificationCode
             });
 
-            // Если код верный, бэкенд отдаст токен
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('username', formData.username);
             localStorage.setItem('role', 'guest');
@@ -69,7 +66,6 @@ function Register() {
         <div className="auth-page">
             <div className="auth-card">
 
-                {/* --- ЭКРАН 1: ФОРМА РЕГИСТРАЦИИ --- */}
                 {step === 1 && (
                     <>
                         <h2 className="auth-title">Создать аккаунт</h2>

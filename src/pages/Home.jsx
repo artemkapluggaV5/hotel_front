@@ -116,9 +116,9 @@ function Home() {
                             value={selectedCategory}
                             onChange={(e) => setSelectedCategory(e.value)}
                             options={categories}
-                            optionLabel="name" // Показываем название категории из базы
+                            optionLabel="name"
                             placeholder="Любая"
-                            showClear // Появляется крестик, чтобы сбросить выбор
+                            showClear
                         />
                     </div>
 

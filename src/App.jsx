@@ -30,7 +30,6 @@ function NavLinks() {
         <div className="nav-links">
             <Link to="/" className={location.pathname === '/' ? "nav-link active" : "nav-link"}>Номера</Link>
             <Link to="/gallery" className="nav-link">Галерея</Link>
-            {/* --- ДОБАВИЛИ ССЫЛКУ "О НАС" --- */}
             <Link to="/about" className={location.pathname === '/about' ? "nav-link active" : "nav-link"}>О нас</Link>
 
             {(role === 'admin' || role === 'staff') && (
