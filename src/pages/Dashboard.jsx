@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import { toast } from 'react-toastify'; // ДОБАВЛЕНО: импорт toast
 import './Account.css';
 
 function Dashboard() {
@@ -36,6 +37,17 @@ function Dashboard() {
         } finally {
             setLoading(false);
         }
+    };
+
+    // Красивые даты на русском
+    const formatHumanDate = (dateStr) => {
+        if (!dateStr) return '';
+        const date = new Date(dateStr);
+        return new Intl.DateTimeFormat('ru-RU', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        }).format(date);
     };
 
     const handleCheckIn = async (id) => {
@@ -113,9 +125,9 @@ function Dashboard() {
                                     </div>
                                     <div className="b-body" style={{marginBottom: '20px'}}>
                                         <div className="b-dates">
-                                            <div><label>Дата заезда</label><p>{p.check_in_date}</p></div>
+                                            <div><label>Дата заезда</label><p>{formatHumanDate(p.check_in_date)}</p></div>
                                             <div className="date-arrow">→</div>
-                                            <div><label>Дата выезда</label><p>{p.check_out_date}</p></div>
+                                            <div><label>Дата выезда</label><p>{formatHumanDate(p.check_out_date)}</p></div>
                                         </div>
                                         <div className="b-price"><label>Гостей</label><p>{p.guests_count} чел.</p></div>
                                     </div>
