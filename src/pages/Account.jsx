@@ -110,7 +110,10 @@ function Account() {
     const handlePayment = async (bookingId) => {
         try {
             toast.info('Перенаправление в банк...');
-            const res = await api.post('pay/', { booking_id: bookingId });
+            const res = await api.post('pay/', {
+                booking_id: bookingId,
+                return_url: window.location.origin
+            });
             window.location.href = res.data.confirmation_url;
         } catch (err) {
             toast.error(err.response?.data?.error || 'Ошибка при создании платежа');

@@ -90,10 +90,13 @@ function RoomDetails() {
             });
 
             toast.info('Создаем защищенный платеж...');
-            const payResponse = await api.post('pay/', { booking_id: bookingId });
+            const payResponse = await api.post('pay/', {
+                booking_id: bookingId,
+                return_url: window.location.origin
+            });
 
             if (payResponse.data.confirmation_url) {
-                window.location.href = payResponse.data.confirmation_url; // Редирект в банк
+                window.location.href = payResponse.data.confirmation_url;
             } else {
                 toast.success('Бронь создана, перейдите в личный кабинет для оплаты.');
                 navigate('/account');
