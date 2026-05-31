@@ -111,7 +111,7 @@ function Account() {
         try {
             toast.info('Перенаправление в банк...');
             const res = await api.post('pay/', { booking_id: bookingId });
-            window.location.href = res.data.confirmation_url; // Переход на ЮKassa
+            window.location.href = res.data.confirmation_url;
         } catch (err) {
             toast.error(err.response?.data?.error || 'Ошибка при создании платежа');
         }
@@ -283,8 +283,8 @@ function Account() {
             </div>
 
             {isModalOpen && (
-                <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-overlay">
+                    <div className="modal-content">
                         <h2>Редактирование профиля</h2>
 
                         <form onSubmit={handleUpdateProfile}>
@@ -326,8 +326,8 @@ function Account() {
             )}
 
             {isPasswordModalOpen && (
-                <div className="modal-overlay" onClick={() => setIsPasswordModalOpen(false)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-overlay">
+                    <div className="modal-content">
                         <h2>Смена пароля</h2>
 
                         <form onSubmit={handleChangePassword}>
@@ -369,7 +369,7 @@ function Account() {
             )}
 
             {voucherBooking && (
-                <div className="modal-overlay" onClick={() => setVoucherBooking(null)}>
+                <div className="modal-overlay">
                     <div className="modal-content printable-voucher" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px', padding: '0', overflow: 'hidden' }}>
                         <div style={{ background: '#0F172A', color: 'white', padding: '30px', textAlign: 'center' }}>
                             <h2 style={{ color: 'white', margin: 0, letterSpacing: '2px' }}>OASIS HOTEL</h2>

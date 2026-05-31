@@ -29,23 +29,26 @@ body {
   align-items: center;
 }
 .logo-container {
-  text-decoration: none;
-  color: #0F172A;
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* Центрируем по вертикали */
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 .logo-container h1 {
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: 1px;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin: 0;
+    line-height: 1;
+    color: #0F172A !important;
 }
 .logo-container p {
-  font-size: 11px;
-  color: #0EA5E9;
-  text-transform: uppercase;
-  font-weight: 600;
-  letter-spacing: 2px;
+    font-size: 10px;
+    color: #0EA5E9 !important;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 3px;
+    margin: 6px 0 0 0;
 }
 
 .nav-links {
@@ -388,54 +391,48 @@ body {
   padding: 0 5px 0 0 !important;
 }
 
-/* --- ВЫПАДАЮЩИЕ СПИСКИ (Категория и Гости) --- */
 .booking-widget .p-dropdown {
   border: none !important;
   background: transparent !important;
   box-shadow: none !important;
-  width: 160px; /* Сделали чуть шире, чтобы всё влезло */
+  width: 160px;
   display: flex;
   align-items: center;
-  position: relative; /* Важно для позиционирования крестика */
+  position: relative;
 }
 
-/* Текст внутри выпадающего списка */
 .booking-widget .p-dropdown-label {
   font-weight: 600;
   color: #0F172A;
   padding: 0 !important;
-  padding-right: 45px !important; /* Делаем жесткий отступ справа, чтобы текст НИКОГДА не налез на иконки */
+  padding-right: 45px !important;
   font-size: 15px;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; /* Если текст длинный, в конце будет "..." */
+  text-overflow: ellipsis;
 }
 
-/* Главная стрелочка (V) */
 .booking-widget .p-dropdown-trigger {
   width: 20px;
   color: #0EA5E9 !important;
   position: absolute;
-  right: 0; /* Прижимаем к правому краю */
+  right: 0;
 }
 
-/* Идеальный крестик очистки (X) */
 .booking-widget .p-dropdown-clear-icon {
   position: absolute !important;
-  right: 25px !important; /* Ставим его ровно перед стрелочкой */
+  right: 25px !important;
   top: 50% !important;
-  transform: translateY(-50%) !important; /* Идеальное выравнивание по вертикали */
-  color: #94A3B8 !important; /* Спокойный серый цвет */
+  transform: translateY(-50%) !important;
+  color: #94A3B8 !important;
   font-size: 14px !important;
   transition: color 0.2s ease;
 }
 
-/* При наведении крестик становится красным */
 .booking-widget .p-dropdown-clear-icon:hover {
   color: #EF4444 !important;
 }
 
-/* Само выпадающее меню (которое открывается по клику) */
 .p-dropdown-panel {
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.1);
@@ -443,15 +440,11 @@ body {
   overflow: hidden;
 }
 
-
-/* =========================================
-   ФУТЕР (ПОДВАЛ САЙТА)
-========================================= */
 .main-footer {
-  background-color: #0F172A; /* Тот же глубокий синий, что в нашем меню и кнопках */
+  background-color: #0F172A;
   color: #94A3B8;
   padding-top: 70px;
-  margin-top: auto; /* Прижимает футер к низу, если контента мало */
+  margin-top: auto;
 }
 
 .footer-grid {
@@ -464,11 +457,10 @@ body {
 .footer-brand {
   display: flex;
   flex-direction: column;
-  align-items: center; /* ЦЕНТРИРУЕМ ВСЁ В ЭТОЙ КОЛОНКЕ */
-  text-align: center;  /* Текст тоже по центру */
+  align-items: center;
+  text-align: center;
 }
 
-/* Блок бренда */
 .footer-brand h2 {
   color: white;
   font-size: 28px;
@@ -496,7 +488,7 @@ body {
 
 .social-icons {
   display: flex;
-  justify-content: center; /* Иконки соцсетей по центру */
+  justify-content: center;
   gap: 15px;
 }
 
@@ -519,7 +511,6 @@ body {
   transform: translateY(-3px);
 }
 
-/* Заголовки колонок */
 .footer-title {
   color: white;
   font-size: 18px;
@@ -527,7 +518,6 @@ body {
   margin-bottom: 25px;
 }
 
-/* Списки ссылок и контактов */
 .footer-links ul, .footer-contact ul {
   list-style: none;
   padding: 0;
@@ -546,7 +536,7 @@ body {
 
 .footer-links a:hover {
   color: #0EA5E9;
-  padding-left: 5px; /* Эффект сдвига при наведении */
+  padding-left: 5px;
 }
 
 .footer-contact li {
@@ -561,7 +551,6 @@ body {
   font-size: 18px;
 }
 
-/* Нижняя полоска с копирайтом */
 .footer-bottom {
   border-top: 1px solid rgba(255,255,255,0.1);
   padding: 25px 0;
@@ -570,10 +559,97 @@ body {
   color: #64748B;
 }
 
-/* Для мобилок */
 @media (max-width: 768px) {
   .footer-grid {
     grid-template-columns: 1fr;
     gap: 40px;
   }
+}
+
+
+@media (max-width: 900px) {
+    .hero-section {
+        height: auto;
+        min-height: 500px;
+        padding: 100px 20px 80px;
+        border-radius: 0 0 30px 30px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .hero-content {
+        transform: none;
+        margin-bottom: 40px;
+    }
+
+    .hero-content h2 {
+        font-size: 28px;
+        line-height: 1.2;
+    }
+
+    .booking-widget {
+        position: relative;
+        bottom: 0;
+        left: 0;
+        transform: none;
+        flex-direction: column;
+        border-radius: 20px;
+        padding: 20px;
+        width: 100%;
+        max-width: 450px;
+        margin: 0 auto;
+    }
+
+    .input-group {
+        border-right: none;
+        border-bottom: 1px solid #E2E8F0;
+        width: 100%;
+        padding: 10px 0;
+        margin-bottom: 10px;
+    }
+
+    .input-group:last-of-type {
+        border-bottom: none;
+    }
+
+    .booking-widget .p-calendar,
+    .booking-widget .p-dropdown {
+        width: 100% !important;
+    }
+
+    .btn-reserve {
+        width: 100%;
+        margin-top: 10px;
+        padding: 15px;
+        border-radius: 12px;
+    }
+
+    .rooms-grid {
+        grid-template-columns: 1fr;
+        margin-top: 40px;
+        gap: 25px;
+    }
+
+    .header-container {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 30px;
+    }
+
+    .social-icons, .footer-contact li {
+        justify-content: center;
+    }
 }

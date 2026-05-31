@@ -11,6 +11,7 @@ import Dashboard from './pages/Dashboard';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Footer from './components/Footer';
+import NotFound from "./pages/NotFound.jsx";
 
 // Измененный блок NavLinks:
 function NavLinks() {
@@ -82,6 +83,7 @@ function App() {
                         <Route path="/rooms/:id" element={<RoomDetails />} />
                         <Route path="/account" element={<Account />} />
                         <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="*" element={<NotFound />} />
                     </Routes>
                 </main>
 

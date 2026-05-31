@@ -314,3 +314,41 @@
 .room-gallery a:hover img {
     transform: scale(1.02);
 }
+
+@media (max-width: 900px) {
+    .room-content-section {
+        flex-direction: column;
+    }
+
+    .room-info {
+        width: 100%;
+        padding-right: 0;
+    }
+
+    .booking-sidebar {
+        width: 100%;
+        margin-top: 30px;
+    }
+
+    .room-gallery {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .main-image {
+        height: 250px;
+        border-radius: 15px;
+    }
+
+    .side-images {
+        flex-direction: row;
+        width: 100%;
+        height: 100px;
+        overflow-x: auto;
+    }
+
+    .side-images a {
+        flex-shrink: 0;
+        width: 120px;
+    }
+}

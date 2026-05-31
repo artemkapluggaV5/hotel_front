@@ -39,7 +39,6 @@ function Register() {
         }
     };
 
-    // ШАГ 2: Отправка введенного кода
     const handleVerifySubmit = async (e) => {
         e.preventDefault();
 
@@ -107,7 +106,6 @@ function Register() {
                     </>
                 )}
 
-                {/* --- ЭКРАН 2: ВВОД КОДА --- */}
                 {step === 2 && (
                     <>
                         <h2 className="auth-title">Подтверждение</h2>

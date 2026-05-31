@@ -11,7 +11,7 @@
 }
 
 .profile-sidebar {
-    position: relative; /* Обязательно! */
+    position: relative;
     background: white;
     padding: 40px 30px;
     border-radius: 24px;
@@ -65,7 +65,6 @@
     color: #1E293B;
 }
 
-/* Табы */
 .tabs {
     display: flex;
     gap: 10px;
@@ -89,7 +88,6 @@
     color: white;
 }
 
-/* Карточки бронирования */
 .booking-card-new {
     background: white;
     border-radius: 20px;
@@ -167,7 +165,6 @@
     border-color: #FEE2E2;
 }
 
-/* Кнопка с карандашом */
 .btn-edit-profile {
     background: transparent;
     border: none;
@@ -177,12 +174,11 @@
     transition: opacity 0.2s, transform 0.2s;
 }
 
-/* Новая позиция кнопки */
 .btn-edit-profile-top {
     position: absolute;
-    top: 20px;    /* Отступ сверху */
-    right: 20px;  /* Отступ справа */
-    background: #F1F5F9; /* Светлый фон для кнопки */
+    top: 20px;
+    right: 20px;
+    background: #F1F5F9;
     border: none;
     width: 32px;
     height: 32px;
@@ -199,7 +195,7 @@
 .btn-edit-profile-top:hover {
     opacity: 1;
     background: #E2E8F0;
-    transform: rotate(15deg); /* Слегка наклоняется при наведении */
+    transform: rotate(15deg);
 }
 
 .btn-edit-profile:hover {
@@ -207,7 +203,6 @@
     transform: scale(1.1);
 }
 
-/* Затемнение фона для модалки */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -222,7 +217,6 @@
     z-index: 1000;
 }
 
-/* Белая карточка формы */
 .modal-content {
     background: white;
     padding: 35px;
@@ -302,3 +296,93 @@
 }
 .btn-modal-save:hover { background: #0284C7; }
 
+@media (max-width: 900px) {
+    .account-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .account-page > div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    .tabs {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .tabs button {
+        width: 48%;
+        margin-bottom: 5px;
+    }
+
+    .b-dates {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .date-arrow {
+        display: none;
+    }
+
+    .b-body {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+}
+
+@media (max-width: 900px) {
+    .account-page > div[style*="display: grid"] {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 15px !important;
+        margin-bottom: 30px !important;
+    }
+
+    .booking-card-new {
+        padding: 20px;
+    }
+
+    .booking-card-new .b-body {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .booking-card-new .b-dates {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .booking-card-new div[style*="display: flex"] {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .booking-card-new button {
+        width: 100% !important;
+    }
+
+    .account-page > div[style*="grid-template-columns: repeat(auto-fill"] {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+
+    .room-card[style*="border-left: 5px solid #F59E0B"] {
+        width: 100% !important;
+        max-width: none !important;
+        text-align: left !important;
+        padding: 20px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .account-page > div[style*="display: grid"] {
+        grid-template-columns: 1fr !important;
+    }
+
+    .section-title {
+        font-size: 24px;
+    }
+}
